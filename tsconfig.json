@@ -1,0 +1,7 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./apps/playground" }
+  ],
+  "extends": "./tsconfig.base.json"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@advanced-datatable/mock-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Mock backend for testing advanced DataTable features",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.0.0"
+  }
+}

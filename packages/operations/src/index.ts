@@ -1,0 +1,13 @@
+export { serializeTarget } from "./targetKey";
+export type { OperationManagerEvent, OperationManagerListener, OperationRecord } from "./types";
+export type { ITargetIndex } from "./ITargetIndex";
+export type { IOperationBatcher, IBatchResult } from "./IOperationBatcher";
+export type { IOperationManager } from "./IOperationManager";
+export type { OperationBatcherOptions } from "./OperationBatcherImpl";
+export type { IOperationPersistence } from "./IOperationPersistence";
+export type { IConnectivityMonitor } from "./IConnectivityMonitor";
+export { TargetIndexImpl } from "./TargetIndexImpl";
+export { OperationBatcherImpl } from "./OperationBatcherImpl";
+export { OperationManagerImpl } from "./OperationManagerImpl";
+export { LocalStorageOperationPersistence, NoOpOperationPersistence } from "./LocalStorageOperationPersistence";
+export { BrowserConnectivityMonitor, NoOpConnectivityMonitor } from "./BrowserConnectivityMonitor";

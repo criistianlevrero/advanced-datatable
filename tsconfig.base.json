@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "ignoreDeprecations": "6.0",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@advanced-datatable/core": ["packages/core/src/index.ts"],
+      "@advanced-datatable/operations": ["packages/operations/src/index.ts"],
+      "@advanced-datatable/api-client": ["packages/api-client/src/index.ts"],
+      "@advanced-datatable/store": ["packages/store/src/index.ts"],
+      "@advanced-datatable/react": ["packages/react/src/index.ts"],
+      "@advanced-datatable/ui": ["packages/ui/src/index.ts"]
+    }
+  }
+}
