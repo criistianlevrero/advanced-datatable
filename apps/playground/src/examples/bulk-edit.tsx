@@ -28,6 +28,9 @@ export function BulkEditExample(): React.ReactElement {
   return (
     <section>
       <h2>Bulk Edit</h2>
+      <p style={{ marginTop: 0, color: "#475569" }}>
+        Click a cell to select it, use Shift or Ctrl/Cmd for ranges, then copy and paste TSV data.
+      </p>
       <DataTable transport={mockTransport} initialState={basicState}>
         <BulkControls />
         <Grid />

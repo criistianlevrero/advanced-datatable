@@ -1,56 +1,135 @@
 import React from "react";
-import { BasicExample } from "./examples/basic";
-import { BulkEditExample } from "./examples/bulk-edit";
-import { SchemaDynamicExample } from "./examples/schema-dynamic";
-import { ReplayOnReconnectExample } from "./examples/replay-on-reconnect";
-import { ErrorRecoveryExample } from "./examples/error-recovery";
-import { PartialResponseExample } from "./examples/partial-response";
-import { EndToEndExample } from "./examples/end-to-end";
+import {
+  ActionIcon,
+  AppShell,
+  Badge,
+  Burger,
+  Button,
+  Group,
+  NavLink,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import {
+  IconAdjustmentsHorizontal,
+  IconArrowsShuffle,
+  IconHome2,
+  IconKeyboard,
+  IconPlugConnected,
+  IconTable,
+} from "@tabler/icons-react";
+import { BrowserRouter, Link, useLocation } from "react-router-dom";
+import { BackendConfigProvider, useBackendConfig } from "./backend/BackendConfigContext";
+import { BackendConfigDrawer } from "./components/BackendConfigDrawer";
+import { AppRoutes } from "./routes";
 
-export function App() {
+function Navigation(): React.ReactElement {
+  const location = useLocation();
+
   return (
-    <main style={{ fontFamily: "system-ui", padding: 24, maxWidth: "1200px", margin: "0 auto" }}>
-      <h1>Advanced DataTable Playground</h1>
-      <p style={{ color: "#666", marginBottom: 8 }}>
-        Explore the full capabilities of the DataTable, including offline support,
-        error recovery, and advanced synchronization features.
-      </p>
-      <div
-        style={{
-          marginBottom: 24,
-          padding: "10px 16px",
-          backgroundColor: "#e7f3ff",
-          borderRadius: 6,
-          fontSize: 14,
-        }}
-      >
-        <strong>Real backend:</strong> run{" "}
-        <code style={{ backgroundColor: "#dce9fa", padding: "1px 6px", borderRadius: 4 }}>
-          npm run mock-backend
-        </code>{" "}
-        in a separate terminal to enable the End-to-End example below.
-      </div>
-      <hr />
+    <Stack gap="xs">
+      <NavLink
+        component={Link}
+        to="/"
+        label="Overview"
+        leftSection={<IconHome2 size={16} />}
+        active={location.pathname === "/"}
+      />
+      <NavLink
+        component={Link}
+        to="/core"
+        label="Core Scenarios"
+        description="Basic, bulk edit, schema"
+        leftSection={<IconTable size={16} />}
+        active={location.pathname === "/core"}
+      />
+      <NavLink
+        component={Link}
+        to="/resilience"
+        label="Resilience Scenarios"
+        description="Replay, retries, partials"
+        leftSection={<IconArrowsShuffle size={16} />}
+        active={location.pathname === "/resilience"}
+      />
+      <NavLink
+        component={Link}
+        to="/backend"
+        label="Backend Integration"
+        description="Real HTTP round-trip"
+        leftSection={<IconPlugConnected size={16} />}
+        active={location.pathname === "/backend"}
+      />
+      <NavLink
+        component={Link}
+        to="/selection-lab"
+        label="Selection Lab"
+        description="Keyboard + paste + read-only"
+        leftSection={<IconKeyboard size={16} />}
+        active={location.pathname === "/selection-lab"}
+      />
+    </Stack>
+  );
+}
 
-      <BasicExample />
-      <hr />
+function PlaygroundShell(): React.ReactElement {
+  const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
+  const [navOpened, { toggle: toggleNav }] = useDisclosure(false);
+  const { backendStatus } = useBackendConfig();
 
-      <BulkEditExample />
-      <hr />
+  return (
+    <AppShell
+      header={{ height: 72 }}
+      navbar={{ width: 280, breakpoint: "sm", collapsed: { mobile: !navOpened } }}
+      padding="lg"
+    >
+      <AppShell.Header>
+        <Group h="100%" px="md" justify="space-between">
+          <Group>
+            <Burger opened={navOpened} onClick={toggleNav} hiddenFrom="sm" size="sm" />
+            <div>
+              <Title order={3}>Advanced DataTable Demo</Title>
+              <Text size="sm" c="dimmed">Categorías de tests y backend compartido</Text>
+            </div>
+          </Group>
 
-      <SchemaDynamicExample />
-      <hr />
+          <Group>
+            <Badge color={backendStatus === "online" ? "teal" : backendStatus === "offline" ? "red" : "gray"}>
+              backend {backendStatus}
+            </Badge>
+            <Button leftSection={<IconAdjustmentsHorizontal size={16} />} onClick={openDrawer}>
+              Backend drawer
+            </Button>
+            <ActionIcon component={Link} to="/backend" variant="light" aria-label="Open backend route">
+              <IconPlugConnected size={18} />
+            </ActionIcon>
+          </Group>
+        </Group>
+      </AppShell.Header>
 
-      <ReplayOnReconnectExample />
-      <hr />
+      <AppShell.Navbar p="md">
+        <Text size="sm" fw={700} c="dimmed" mb="sm">
+          Test categories
+        </Text>
+        <Navigation />
+      </AppShell.Navbar>
 
-      <ErrorRecoveryExample />
-      <hr />
+      <AppShell.Main>
+        <AppRoutes />
+      </AppShell.Main>
 
-      <PartialResponseExample />
-      <hr />
+      <BackendConfigDrawer opened={drawerOpened} onClose={closeDrawer} />
+    </AppShell>
+  );
+}
 
-      <EndToEndExample />
-    </main>
+export function App(): React.ReactElement {
+  return (
+    <BackendConfigProvider>
+      <BrowserRouter>
+        <PlaygroundShell />
+      </BrowserRouter>
+    </BackendConfigProvider>
   );
 }
