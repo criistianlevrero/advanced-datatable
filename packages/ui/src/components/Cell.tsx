@@ -9,6 +9,11 @@ export interface CellProps {
   renderValue?: (cell: CellModel) => React.ReactNode;
   className?: string;
   editable?: boolean;
+  selected?: boolean;
+  focused?: boolean;
+  pending?: boolean;
+  onMouseDown?: React.MouseEventHandler<HTMLTableCellElement>;
+  onMouseEnter?: React.MouseEventHandler<HTMLTableCellElement>;
 }
 
 export function Cell({
@@ -17,9 +22,16 @@ export function Cell({
   renderValue,
   className,
   editable = true,
+  selected = false,
+  focused = false,
+  pending = false,
+  onMouseDown,
+  onMouseEnter,
 }: CellProps): React.ReactElement {
   const cell = useCell(rowId, colId);
   const column = useDataTable((s) => s.getSchema().columns[colId]);
+  const isReadOnly = column?.meta?.readOnly === true || cell.meta?.readOnly === true;
+  const canEdit = editable && !isReadOnly;
   const store = React.useContext(DataTableContext);
   const [isEditing, setIsEditing] = React.useState(false);
   const [draft, setDraft] = React.useState(String(cell.value ?? ""));
@@ -31,7 +43,7 @@ export function Cell({
   }, [cell.value, isEditing]);
 
   const commit = React.useCallback(() => {
-    if (!editable) {
+    if (!canEdit) {
       setIsEditing(false);
       return;
     }
@@ -49,7 +61,7 @@ export function Cell({
       colId,
       value: parseDraftValue(draft, column?.type, cell.value),
     });
-  }, [cell.value, colId, column?.type, draft, editable, rowId, store]);
+  }, [canEdit, cell.value, colId, column?.type, draft, rowId, store]);
 
   const cancel = React.useCallback(() => {
     setDraft(String(cell.value ?? ""));
@@ -59,10 +71,11 @@ export function Cell({
   const content = renderValue ? renderValue(cell) : String(cell.value ?? "");
   const isBooleanColumn = column?.type === "boolean";
   const inputType = column?.type === "number" ? "number" : column?.type === "date" ? "date" : "text";
+  const selectionStyle = getCellSelectionStyle(selected, focused);
 
-  if (isEditing && editable) {
+  if (isEditing && canEdit) {
     return (
-      <td className={className}>
+      <td className={className} style={selectionStyle}>
         {isBooleanColumn ? (
           <select
             autoFocus
@@ -102,8 +115,15 @@ export function Cell({
   return (
     <td
       className={className}
+      style={selectionStyle}
+      aria-selected={selected || undefined}
+      data-cell-selected={selected || undefined}
+      data-cell-pending={pending || undefined}
+      data-cell-focused={focused || undefined}
+      onMouseDown={onMouseDown}
+      onMouseEnter={onMouseEnter}
       onDoubleClick={() => {
-        if (editable) {
+        if (canEdit) {
           setIsEditing(true);
         }
       }}
@@ -111,6 +131,17 @@ export function Cell({
       {content}
     </td>
   );
+}
+
+function getCellSelectionStyle(selected: boolean, focused: boolean): React.CSSProperties | undefined {
+  if (!selected && !focused) {
+    return undefined;
+  }
+
+  return {
+    backgroundColor: selected ? "#e8f0fe" : undefined,
+    boxShadow: focused ? "inset 0 0 0 2px #1a73e8" : selected ? "inset 0 0 0 1px #8ab4f8" : undefined,
+  };
 }
 
 function parseDraftValue(
