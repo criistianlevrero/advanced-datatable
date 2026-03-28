@@ -1,35 +1,45 @@
-import { useState, useCallback } from "react";
+import { useCallback, useContext } from "react";
+import { useDataTable } from "./useDataTable";
+import { DataTableContext } from "../context/DataTableContext";
 
 export interface SelectionState {
-  selectedRowIds: Set<string>;
+  selectedRowIds: ReadonlySet<string>;
   toggleRow(rowId: string): void;
-  selectAll(rowIds: string[]): void;
+  /** Replace selection with the given row IDs. Pass no args to select all visible rows. */
+  selectAll(rowIds?: string[]): void;
   clearSelection(): void;
   isSelected(rowId: string): boolean;
 }
 
+/**
+ * Returns row selection state and control methods backed by the DataTable store.
+ * Must be used within a DataTable context.
+ */
 export function useSelection(): SelectionState {
-  const [selectedRowIds, setSelected] = useState<Set<string>>(new Set());
+  const selectedRowIds = useDataTable((s) => s.getSelectedRowIds());
+  const store = useContext(DataTableContext);
 
-  const toggleRow = useCallback((rowId: string) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(rowId)) {
-        next.delete(rowId);
+  const toggleRow = useCallback(
+    (rowId: string) => {
+      store?.getState().toggleRowSelection(rowId);
+    },
+    [store],
+  );
+
+  const selectAll = useCallback(
+    (rowIds?: string[]) => {
+      if (rowIds !== undefined) {
+        store?.getState().setRowSelection(rowIds);
       } else {
-        next.add(rowId);
+        store?.getState().selectAllRows();
       }
-      return next;
-    });
-  }, []);
-
-  const selectAll = useCallback((rowIds: string[]) => {
-    setSelected(new Set(rowIds));
-  }, []);
+    },
+    [store],
+  );
 
   const clearSelection = useCallback(() => {
-    setSelected(new Set());
-  }, []);
+    store?.getState().clearSelection();
+  }, [store]);
 
   const isSelected = useCallback(
     (rowId: string) => selectedRowIds.has(rowId),
