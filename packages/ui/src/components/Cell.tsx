@@ -78,9 +78,9 @@ export function Cell({
       <td
         className={[
           className,
-          'border border-[var(--dt-border)] px-2 py-1 text-sm font-dt',
-          selected ? 'bg-[var(--dt-row-hover)]' : '',
-          focused ? 'ring-2 ring-[var(--dt-primary)]' : '',
+          'border border-(--dt-border) px-2 py-1 text-sm font-dt',
+          selected ? 'bg-(--dt-row-hover)' : '',
+          focused ? 'ring-2 ring-(--dt-primary)' : '',
         ].join(' ')}
         aria-selected={selected || undefined}
         data-cell-selected={selected || undefined}
@@ -98,7 +98,7 @@ export function Cell({
                 cancel();
               }
             }}
-            className="w-full rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5 text-sm focus:ring-2 focus:ring-[var(--dt-primary)]"
+            className="w-full rounded border border-(--dt-border) bg-(--dt-bg) px-1 py-0.5 text-sm focus:ring-2 focus:ring-(--dt-primary)"
           >
             <option value="true">true</option>
             <option value="false">false</option>
@@ -118,7 +118,7 @@ export function Cell({
                 cancel();
               }
             }}
-            className="w-full rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5 text-sm focus:ring-2 focus:ring-[var(--dt-primary)]"
+            className="w-full rounded border border-(--dt-border) bg-(--dt-bg) px-1 py-0.5 text-sm focus:ring-2 focus:ring-(--dt-primary)"
           />
         )}
       </td>
@@ -129,9 +129,9 @@ export function Cell({
     <td
       className={[
         className,
-        'border border-[var(--dt-border)] px-2 py-1 text-sm font-dt transition-colors',
-        selected ? 'bg-[var(--dt-row-hover)]' : '',
-        focused ? 'ring-2 ring-[var(--dt-primary)]' : '',
+        'border border-(--dt-border) px-2 py-1 text-sm font-dt transition-colors',
+        selected ? 'bg-(--dt-row-hover)' : '',
+        focused ? 'ring-2 ring-(--dt-primary)' : '',
       ].join(' ')}
       aria-selected={selected || undefined}
       data-cell-selected={selected || undefined}

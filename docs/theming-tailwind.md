@@ -30,7 +30,7 @@ La librería utiliza Tailwind CSS para todos los estilos, pero expone un sistema
 ## Ejemplo de uso en componentes
 
 ```jsx
-<div className="bg-[var(--dt-bg)] text-[var(--dt-header-color)] font-[var(--dt-font)] rounded-[var(--dt-radius)] ...">
+<div className="bg-(--dt-bg) text-(--dt-header-color) font-(--dt-font) rounded-(--dt-radius) ...">
   ...
 </div>
 ```

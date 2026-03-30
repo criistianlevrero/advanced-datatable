@@ -377,7 +377,7 @@ export function Grid({
       <thead>
         <tr className={headerClassName}>
           {selectable && (
-            <th className="w-9 text-center bg-[var(--dt-header-bg)] text-[var(--dt-header-color)] font-dt">
+            <th className="w-9 text-center bg-(--dt-header-bg) text-(--dt-header-color) font-dt">
               <input
                 type="checkbox"
                 checked={allVisibleSelected}
@@ -386,7 +386,7 @@ export function Grid({
                 }}
                 onChange={handleToggleAll}
                 aria-label="Select all visible rows"
-                className="accent-[var(--dt-primary)]"
+                className="accent-(--dt-primary)"
               />
             </th>
           )}
@@ -406,8 +406,8 @@ export function Grid({
                 onMouseLeave={() => setHoveredResizableColId((prev) => (prev === colId ? null : prev))}
                 className={[
                   'relative cursor-pointer select-none whitespace-nowrap transition-colors',
-                  isFilterActive ? 'bg-[var(--dt-header-bg)] shadow-[inset_0_-2px_0_var(--dt-primary)]' : 'bg-[var(--dt-header-bg)]',
-                  'text-[var(--dt-header-color)] font-dt',
+                  isFilterActive ? 'bg-(--dt-header-bg) shadow-[inset_0_-2px_0_var(--dt-primary)]' : 'bg-(--dt-header-bg)',
+                  'text-(--dt-header-color) font-dt',
                 ].join(' ')}
                 title={`Sort by ${col?.title ?? colId}`}
               >
@@ -425,8 +425,8 @@ export function Grid({
                         }}
                         className={[
                           'appearance-none border-0 bg-transparent p-0 m-0 shadow-none outline-none',
-                          isFilterActive ? 'text-[var(--dt-primary)]' : 'text-[var(--dt-header-color)]',
-                          'hover:text-[var(--dt-primary)] focus:outline-none',
+                          isFilterActive ? 'text-(--dt-primary)' : 'text-(--dt-header-color)',
+                          'hover:text-(--dt-primary) focus:outline-none',
                         ].join(' ')}
                         style={{ lineHeight: 1, width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', boxShadow: 'none' }}
                       >
@@ -443,8 +443,8 @@ export function Grid({
                       }}
                       className={[
                         'appearance-none border-0 bg-transparent p-0 m-0 shadow-none outline-none',
-                        isSorted ? 'text-[var(--dt-primary)] font-bold' : 'text-[var(--dt-header-color)]',
-                        'hover:text-[var(--dt-primary)] focus:outline-none',
+                        isSorted ? 'text-(--dt-primary) font-bold' : 'text-(--dt-header-color)',
+                        'hover:text-(--dt-primary) focus:outline-none',
                       ].join(' ')}
                       style={{ lineHeight: 1, width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', boxShadow: 'none' }}
                     >
@@ -495,7 +495,7 @@ export function Grid({
                   <div
                     ref={filterMenuRef}
                     onClick={(event) => event.stopPropagation()}
-                    className="absolute right-1 top-full z-10 min-w-[180px] p-2 border border-[var(--dt-border)] rounded-lg bg-[var(--dt-bg)] shadow-lg"
+                    className="absolute right-1 top-full z-10 min-w-45 p-2 border border-(--dt-border) rounded-lg bg-(--dt-bg) shadow-lg"
                   >
                     {renderFilterMenu({
                       colId,
@@ -522,8 +522,8 @@ export function Grid({
               className={[
                 rowClassName,
                 'transition-colors',
-                isSelected ? 'bg-[var(--dt-row-hover)]' : 'bg-[var(--dt-bg)]',
-                'hover:bg-[var(--dt-row-hover)]',
+                isSelected ? 'bg-(--dt-row-hover)' : 'bg-(--dt-bg)',
+                'hover:bg-(--dt-row-hover)',
               ].join(' ')}
               aria-selected={selectable ? isSelected : undefined}
             >
@@ -534,7 +534,7 @@ export function Grid({
                     checked={isSelected}
                     onChange={() => store?.getState().toggleRowSelection(rowId)}
                     aria-label={`Select row ${rowId}`}
-                    className="accent-[var(--dt-primary)]"
+                    className="accent-(--dt-primary)"
                   />
                 </td>
               )}
@@ -543,9 +543,9 @@ export function Grid({
                   <td
                     key={colId}
                     className={[
-                      'border border-[var(--dt-border)] px-2 py-1 text-sm font-dt',
-                      store?.getState().isCellSelected(rowId, colId) ? 'bg-[var(--dt-row-hover)]' : '',
-                      cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId ? 'ring-2 ring-[var(--dt-primary)]' : '',
+                      'border border-(--dt-border) px-2 py-1 text-sm font-dt',
+                      store?.getState().isCellSelected(rowId, colId) ? 'bg-(--dt-row-hover)' : '',
+                      cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId ? 'ring-2 ring-(--dt-primary)' : '',
                     ].join(' ')}
                     aria-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
                     data-cell-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
@@ -620,7 +620,7 @@ function renderFilterMenu(params: {
             }
             placeholder="Min"
             aria-label="Filter min"
-            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5 mb-1"
+            className="w-full box-border text-xs rounded border border-(--dt-border) bg-(--dt-bg) px-1 py-0.5 mb-1"
           />
           <input
             type="number"
@@ -635,7 +635,7 @@ function renderFilterMenu(params: {
             }
             placeholder="Max"
             aria-label="Filter max"
-            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5"
+            className="w-full box-border text-xs rounded border border-(--dt-border) bg-(--dt-bg) px-1 py-0.5"
           />
         </>
       )}
@@ -651,7 +651,7 @@ function renderFilterMenu(params: {
             })
           }
           aria-label="Filter boolean"
-          className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5"
+          className="w-full box-border text-xs rounded border border-(--dt-border) bg-(--dt-bg) px-1 py-0.5"
         >
           <option value="all">All</option>
           <option value="true">True</option>
@@ -673,7 +673,7 @@ function renderFilterMenu(params: {
               })
             }
             aria-label="Filter from"
-            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5 mb-1"
+            className="w-full box-border text-xs rounded border border-(--dt-border) bg-(--dt-bg) px-1 py-0.5 mb-1"
           />
           <input
             type="date"
@@ -687,7 +687,7 @@ function renderFilterMenu(params: {
               })
             }
             aria-label="Filter to"
-            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5"
+            className="w-full box-border text-xs rounded border border-(--dt-border) bg-(--dt-bg) px-1 py-0.5"
           />
         </>
       )}
@@ -706,7 +706,7 @@ function renderFilterMenu(params: {
             }
             placeholder="Contains..."
             aria-label="Filter text"
-            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5"
+            className="w-full box-border text-xs rounded border border-(--dt-border) bg-(--dt-bg) px-1 py-0.5"
           />
         )}
 
@@ -716,7 +716,7 @@ function renderFilterMenu(params: {
           checked={Boolean(effectiveFilter.invert)}
           onChange={() => onToggleInvert(colId)}
           aria-label="Invert filter"
-          className="accent-[var(--dt-primary)]"
+          className="accent-(--dt-primary)"
         />
         Invert filter
       </label>
@@ -724,7 +724,7 @@ function renderFilterMenu(params: {
       <button
         type="button"
         onClick={() => onRemove(colId)}
-        className="mt-2 border border-[var(--dt-border)] bg-[var(--dt-bg-alt)] rounded px-2 py-1 text-xs cursor-pointer text-left hover:bg-[var(--dt-row-hover)]"
+        className="mt-2 border border-(--dt-border) bg-(--dt-bg-alt) rounded px-2 py-1 text-xs cursor-pointer text-left hover:bg-(--dt-row-hover)"
       >
         Remove filter
       </button>
