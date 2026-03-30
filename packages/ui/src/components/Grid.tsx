@@ -377,7 +377,7 @@ export function Grid({
       <thead>
         <tr className={headerClassName}>
           {selectable && (
-            <th style={{ width: 36, textAlign: "center" }}>
+            <th className="w-9 text-center bg-[var(--dt-header-bg)] text-[var(--dt-header-color)] font-dt">
               <input
                 type="checkbox"
                 checked={allVisibleSelected}
@@ -386,6 +386,7 @@ export function Grid({
                 }}
                 onChange={handleToggleAll}
                 aria-label="Select all visible rows"
+                className="accent-[var(--dt-primary)]"
               />
             </th>
           )}
@@ -397,25 +398,22 @@ export function Grid({
             const isFilterMenuOpen = showFilters && openFilterColId === colId;
             const isColumnResizable = resizableColumns && col?.meta?.resizable !== false;
             return (
+
               <th
                 key={colId}
                 onClick={() => handleToggleSort(colId)}
                 onMouseEnter={() => setHoveredResizableColId(colId)}
                 onMouseLeave={() => setHoveredResizableColId((prev) => (prev === colId ? null : prev))}
-                style={{
-                  cursor: "pointer",
-                  userSelect: "none",
-                  whiteSpace: "nowrap",
-                  position: "relative",
-                  backgroundColor: isFilterActive ? "#eef9f1" : undefined,
-                  boxShadow: isFilterActive ? "inset 0 -2px 0 #2f9e44" : undefined,
-                }}
+                className={[
+                  'relative cursor-pointer select-none whitespace-nowrap transition-colors',
+                  isFilterActive ? 'bg-[var(--dt-header-bg)] shadow-[inset_0_-2px_0_var(--dt-primary)]' : 'bg-[var(--dt-header-bg)]',
+                  'text-[var(--dt-header-color)] font-dt',
+                ].join(' ')}
                 title={`Sort by ${col?.title ?? colId}`}
               >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-                  <span>{col?.title ?? colId}</span>
-
-                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <div className="flex flex-row items-center gap-1.5 justify-start w-full">
+                  <span className="truncate">{col?.title ?? colId}</span>
+                  <div className="flex items-center gap-1">
                     {showFilters && (
                       <button
                         type="button"
@@ -425,20 +423,16 @@ export function Grid({
                           event.stopPropagation();
                           setOpenFilterColId((prev) => (prev === colId ? null : colId));
                         }}
-                        style={{
-                          border: "none",
-                          background: "transparent",
-                          color: isFilterActive ? "#2b8a3e" : "#495057",
-                          borderRadius: 6,
-                          padding: "1px 4px",
-                          fontSize: "0.8em",
-                          cursor: "pointer",
-                        }}
+                        className={[
+                          'appearance-none border-0 bg-transparent p-0 m-0 shadow-none outline-none',
+                          isFilterActive ? 'text-[var(--dt-primary)]' : 'text-[var(--dt-header-color)]',
+                          'hover:text-[var(--dt-primary)] focus:outline-none',
+                        ].join(' ')}
+                        style={{ lineHeight: 1, width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', boxShadow: 'none' }}
                       >
                         <span aria-hidden="true">🔍</span>
                       </button>
                     )}
-
                     <button
                       type="button"
                       aria-label={`Sort by ${col?.title ?? colId}`}
@@ -447,15 +441,12 @@ export function Grid({
                         event.stopPropagation();
                         handleToggleSort(colId);
                       }}
-                      style={{
-                        border: "none",
-                        background: "transparent",
-                        color: isSorted ? "#1f2328" : "#868e96",
-                        borderRadius: 6,
-                        padding: "1px 4px",
-                        fontSize: "0.85em",
-                        cursor: "pointer",
-                      }}
+                      className={[
+                        'appearance-none border-0 bg-transparent p-0 m-0 shadow-none outline-none',
+                        isSorted ? 'text-[var(--dt-primary)] font-bold' : 'text-[var(--dt-header-color)]',
+                        'hover:text-[var(--dt-primary)] focus:outline-none',
+                      ].join(' ')}
+                      style={{ lineHeight: 1, width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', boxShadow: 'none' }}
                     >
                       <span aria-hidden="true">{isSorted ? SORT_ICONS[sortState!.direction].trim() : "↕"}</span>
                     </button>
@@ -504,18 +495,7 @@ export function Grid({
                   <div
                     ref={filterMenuRef}
                     onClick={(event) => event.stopPropagation()}
-                    style={{
-                      position: "absolute",
-                      right: 4,
-                      top: "calc(100% + 4px)",
-                      zIndex: 5,
-                      minWidth: 180,
-                      padding: 8,
-                      border: "1px solid #dee2e6",
-                      borderRadius: 8,
-                      background: "#fff",
-                      boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
-                    }}
+                    className="absolute right-1 top-full z-10 min-w-[180px] p-2 border border-[var(--dt-border)] rounded-lg bg-[var(--dt-bg)] shadow-lg"
                   >
                     {renderFilterMenu({
                       colId,
@@ -539,16 +519,22 @@ export function Grid({
           return (
             <tr
               key={rowId}
-              className={rowClassName}
+              className={[
+                rowClassName,
+                'transition-colors',
+                isSelected ? 'bg-[var(--dt-row-hover)]' : 'bg-[var(--dt-bg)]',
+                'hover:bg-[var(--dt-row-hover)]',
+              ].join(' ')}
               aria-selected={selectable ? isSelected : undefined}
             >
               {selectable && (
-                <td style={{ width: 36, textAlign: "center" }}>
+                <td className="w-9 text-center">
                   <input
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => store?.getState().toggleRowSelection(rowId)}
                     aria-label={`Select row ${rowId}`}
+                    className="accent-[var(--dt-primary)]"
                   />
                 </td>
               )}
@@ -556,7 +542,11 @@ export function Grid({
                 renderCell ? (
                   <td
                     key={colId}
-                    style={getCellFrameStyle(rowId, colId)}
+                    className={[
+                      'border border-[var(--dt-border)] px-2 py-1 text-sm font-dt',
+                      store?.getState().isCellSelected(rowId, colId) ? 'bg-[var(--dt-row-hover)]' : '',
+                      cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId ? 'ring-2 ring-[var(--dt-primary)]' : '',
+                    ].join(' ')}
                     aria-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
                     data-cell-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
                     data-cell-pending={
@@ -630,7 +620,7 @@ function renderFilterMenu(params: {
             }
             placeholder="Min"
             aria-label="Filter min"
-            style={{ width: "100%", boxSizing: "border-box", fontSize: "0.85em" }}
+            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5 mb-1"
           />
           <input
             type="number"
@@ -645,7 +635,7 @@ function renderFilterMenu(params: {
             }
             placeholder="Max"
             aria-label="Filter max"
-            style={{ width: "100%", boxSizing: "border-box", fontSize: "0.85em" }}
+            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5"
           />
         </>
       )}
@@ -661,7 +651,7 @@ function renderFilterMenu(params: {
             })
           }
           aria-label="Filter boolean"
-          style={{ width: "100%", boxSizing: "border-box", fontSize: "0.85em" }}
+          className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5"
         >
           <option value="all">All</option>
           <option value="true">True</option>
@@ -683,7 +673,7 @@ function renderFilterMenu(params: {
               })
             }
             aria-label="Filter from"
-            style={{ width: "100%", boxSizing: "border-box", fontSize: "0.85em" }}
+            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5 mb-1"
           />
           <input
             type="date"
@@ -697,7 +687,7 @@ function renderFilterMenu(params: {
               })
             }
             aria-label="Filter to"
-            style={{ width: "100%", boxSizing: "border-box", fontSize: "0.85em" }}
+            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5"
           />
         </>
       )}
@@ -716,16 +706,17 @@ function renderFilterMenu(params: {
             }
             placeholder="Contains..."
             aria-label="Filter text"
-            style={{ width: "100%", boxSizing: "border-box", fontSize: "0.85em" }}
+            className="w-full box-border text-xs rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5"
           />
         )}
 
-      <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.8em" }}>
+      <label className="flex items-center gap-1 text-xs mt-1">
         <input
           type="checkbox"
           checked={Boolean(effectiveFilter.invert)}
           onChange={() => onToggleInvert(colId)}
           aria-label="Invert filter"
+          className="accent-[var(--dt-primary)]"
         />
         Invert filter
       </label>
@@ -733,15 +724,7 @@ function renderFilterMenu(params: {
       <button
         type="button"
         onClick={() => onRemove(colId)}
-        style={{
-          border: "1px solid #dee2e6",
-          background: "#f8f9fa",
-          borderRadius: 6,
-          padding: "4px 8px",
-          cursor: "pointer",
-          fontSize: "0.8em",
-          textAlign: "left",
-        }}
+        className="mt-2 border border-[var(--dt-border)] bg-[var(--dt-bg-alt)] rounded px-2 py-1 text-xs cursor-pointer text-left hover:bg-[var(--dt-row-hover)]"
       >
         Remove filter
       </button>

@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { DataTable, Grid } from "@advanced-datatable/ui";
 import { DataTableContext, useDataTable } from "@advanced-datatable/react";
 import { mockTransport } from "../mocks/mockTransport";
+import { Title } from "@mantine/core";
 
 function SchemaControls() {
   const store = useContext(DataTableContext);
@@ -39,7 +40,7 @@ function SchemaControls() {
 export function SchemaDynamicExample(): React.ReactElement {
   return (
     <section>
-      <h2>Dynamic Schema</h2>
+      <Title order={2}>Dynamic Schema</Title>
       <DataTable
         transport={mockTransport}
         initialState={{

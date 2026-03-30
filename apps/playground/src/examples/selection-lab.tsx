@@ -10,7 +10,7 @@ export function SelectionLabExample(): React.ReactElement {
     <section>
       <Stack gap="md">
         <div>
-          <Title order={3}>Selection and Paste Lab (10 x 30)</Title>
+          <Title order={3} className="text-red-500">Selection and Paste Lab (10 x 30)</Title>
           <Text c="dimmed" size="sm">
             Tabla de prueba para selección por rango, copy/paste y comportamiento con columnas/celdas read-only.
           </Text>
@@ -39,7 +39,6 @@ export function SelectionLabExample(): React.ReactElement {
           <Text size="sm">Celdas read-only: algunas celdas en Notes (cada 5 filas).</Text>
           <Text size="sm">Columnas no-resizeables: ID y Status. El resto se puede redimensionar desde el header.</Text>
         </Alert>
-
           <DataTable
             transport={mockTransport}
             initialState={selectionLabState}

@@ -1,0 +1,12 @@
+
+:root {
+  --dt-primary: #2563eb;
+  --dt-bg: #fff;
+  --dt-bg-alt: #f3f4f6;
+  --dt-border: #e5e7eb;
+  --dt-header-bg: #f9fafb;
+  --dt-header-color: #111827;
+  --dt-row-hover: #e0e7ff;
+  --dt-radius: 0.375rem;
+  --dt-font: 'Inter', sans-serif;
+}

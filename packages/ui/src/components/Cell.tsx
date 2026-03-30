@@ -71,11 +71,22 @@ export function Cell({
   const content = renderValue ? renderValue(cell) : String(cell.value ?? "");
   const isBooleanColumn = column?.type === "boolean";
   const inputType = column?.type === "number" ? "number" : column?.type === "date" ? "date" : "text";
-  const selectionStyle = getCellSelectionStyle(selected, focused);
+
 
   if (isEditing && canEdit) {
     return (
-      <td className={className} style={selectionStyle}>
+      <td
+        className={[
+          className,
+          'border border-[var(--dt-border)] px-2 py-1 text-sm font-dt',
+          selected ? 'bg-[var(--dt-row-hover)]' : '',
+          focused ? 'ring-2 ring-[var(--dt-primary)]' : '',
+        ].join(' ')}
+        aria-selected={selected || undefined}
+        data-cell-selected={selected || undefined}
+        data-cell-pending={pending || undefined}
+        data-cell-focused={focused || undefined}
+      >
         {isBooleanColumn ? (
           <select
             autoFocus
@@ -87,6 +98,7 @@ export function Cell({
                 cancel();
               }
             }}
+            className="w-full rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5 text-sm focus:ring-2 focus:ring-[var(--dt-primary)]"
           >
             <option value="true">true</option>
             <option value="false">false</option>
@@ -106,6 +118,7 @@ export function Cell({
                 cancel();
               }
             }}
+            className="w-full rounded border border-[var(--dt-border)] bg-[var(--dt-bg)] px-1 py-0.5 text-sm focus:ring-2 focus:ring-[var(--dt-primary)]"
           />
         )}
       </td>
@@ -114,8 +127,12 @@ export function Cell({
 
   return (
     <td
-      className={className}
-      style={selectionStyle}
+      className={[
+        className,
+        'border border-[var(--dt-border)] px-2 py-1 text-sm font-dt transition-colors',
+        selected ? 'bg-[var(--dt-row-hover)]' : '',
+        focused ? 'ring-2 ring-[var(--dt-primary)]' : '',
+      ].join(' ')}
       aria-selected={selected || undefined}
       data-cell-selected={selected || undefined}
       data-cell-pending={pending || undefined}
@@ -133,16 +150,7 @@ export function Cell({
   );
 }
 
-function getCellSelectionStyle(selected: boolean, focused: boolean): React.CSSProperties | undefined {
-  if (!selected && !focused) {
-    return undefined;
-  }
-
-  return {
-    backgroundColor: selected ? "#e8f0fe" : undefined,
-    boxShadow: focused ? "inset 0 0 0 2px #1a73e8" : selected ? "inset 0 0 0 1px #8ab4f8" : undefined,
-  };
-}
+// Eliminado: getCellSelectionStyle. Ahora todo es por clases Tailwind y tokens CSS.
 
 function parseDraftValue(
   draft: string,

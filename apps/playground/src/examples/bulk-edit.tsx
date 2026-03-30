@@ -3,6 +3,7 @@ import { DataTable, Grid } from "@advanced-datatable/ui";
 import { DataTableContext, useDataTable } from "@advanced-datatable/react";
 import { basicState } from "../mocks/data";
 import { mockTransport } from "../mocks/mockTransport";
+import { Title } from "@mantine/core";
 
 function BulkControls() {
   const store = useContext(DataTableContext);
@@ -27,7 +28,7 @@ function BulkControls() {
 export function BulkEditExample(): React.ReactElement {
   return (
     <section>
-      <h2>Bulk Edit</h2>
+      <Title order={2}>Bulk Edit</Title>
       <p style={{ marginTop: 0, color: "#475569" }}>
         Click a cell to select it, use Shift or Ctrl/Cmd for ranges, then copy and paste TSV data.
       </p>

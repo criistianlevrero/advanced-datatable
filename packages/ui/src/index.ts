@@ -1,3 +1,4 @@
+import './index.css';
 export { Cell } from "./components/Cell";
 export type { CellProps } from "./components/Cell";
 export { Grid } from "./components/Grid";
