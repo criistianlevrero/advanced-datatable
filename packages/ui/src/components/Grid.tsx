@@ -1,4 +1,5 @@
 import React from "react";
+import { Icon } from "./Icon";
 import type { TargetDescriptor } from "@advanced-datatable/core";
 import type { FilterValue } from "@advanced-datatable/store";
 import { DataTableContext, useDataTable } from "@advanced-datatable/react";
@@ -375,7 +376,10 @@ export function Grid({
         })}
       </colgroup>
       <thead>
-        <tr className={headerClassName}>
+        <tr
+          className={headerClassName}
+          style={{ border: '2px solid var(--dt-border)', borderRadius: 6, boxSizing: 'border-box' }}
+        >
           {selectable && (
             <th className="w-9 text-center bg-(--dt-header-bg) text-(--dt-header-color) font-dt">
               <input
@@ -398,22 +402,22 @@ export function Grid({
             const isFilterMenuOpen = showFilters && openFilterColId === colId;
             const isColumnResizable = resizableColumns && col?.meta?.resizable !== false;
             return (
-
               <th
                 key={colId}
-                onClick={() => handleToggleSort(colId)}
                 onMouseEnter={() => setHoveredResizableColId(colId)}
                 onMouseLeave={() => setHoveredResizableColId((prev) => (prev === colId ? null : prev))}
                 className={[
-                  'relative cursor-pointer select-none whitespace-nowrap transition-colors',
+                  'relative select-none whitespace-nowrap transition-colors',
                   isFilterActive ? 'bg-(--dt-header-bg) shadow-[inset_0_-2px_0_var(--dt-primary)]' : 'bg-(--dt-header-bg)',
                   'text-(--dt-header-color) font-dt',
+                  'px-1', // padding left/right 0.25rem
+                  'py-1', // padding top/bottom 0.25rem
                 ].join(' ')}
                 title={`Sort by ${col?.title ?? colId}`}
               >
-                <div className="flex flex-row items-center gap-1.5 justify-start w-full">
+                <div className="flex flex-row items-center gap-1.5 justify-between w-full">
                   <span className="truncate">{col?.title ?? colId}</span>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 ml-auto">
                     {showFilters && (
                       <button
                         type="button"
@@ -430,7 +434,7 @@ export function Grid({
                         ].join(' ')}
                         style={{ lineHeight: 1, width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', boxShadow: 'none' }}
                       >
-                        <span aria-hidden="true">🔍</span>
+                        <Icon name="search" size={16} />
                       </button>
                     )}
                     <button
@@ -446,9 +450,15 @@ export function Grid({
                         isSorted ? 'text-(--dt-primary) font-bold' : 'text-(--dt-header-color)',
                         'hover:text-(--dt-primary) focus:outline-none',
                       ].join(' ')}
-                      style={{ lineHeight: 1, width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', boxShadow: 'none' }}
+                      style={{ lineHeight: 1, width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', boxShadow: 'none', marginLeft: 'auto' }}
                     >
-                      <span aria-hidden="true">{isSorted ? SORT_ICONS[sortState!.direction].trim() : "↕"}</span>
+                      <span aria-hidden="true">
+                        {isSorted
+                          ? sortState!.direction === 'asc'
+                            ? <Icon name="arrow-up" size={16} />
+                            : <Icon name="arrow-down" size={16} />
+                          : <Icon name="arrow-up-down" size={16} />}
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -516,6 +526,7 @@ export function Grid({
       <tbody>
         {rowOrder.map((rowId) => {
           const isSelected = selectedRowIds.has(rowId);
+          // const isLastRow = rowIdx === rowOrder.length - 1;
           return (
             <tr
               key={rowId}
@@ -538,42 +549,48 @@ export function Grid({
                   />
                 </td>
               )}
-              {schema.columnOrder.map((colId) =>
-                renderCell ? (
-                  <td
-                    key={colId}
-                    className={[
-                      'border border-(--dt-border) px-2 py-1 text-sm font-dt',
-                      store?.getState().isCellSelected(rowId, colId) ? 'bg-(--dt-row-hover)' : '',
-                      cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId ? 'ring-2 ring-(--dt-primary)' : '',
-                    ].join(' ')}
-                    aria-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
-                    data-cell-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
-                    data-cell-pending={
-                      pendingPasteTarget && isCellInRangeTarget(rowId, colId, pendingPasteTarget) ? true : undefined
-                    }
-                    data-cell-focused={
-                      (cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId) || undefined
-                    }
-                    onMouseDown={(event) => handleCellMouseDown(rowId, colId, event)}
-                    onMouseEnter={() => handleCellMouseEnter(rowId, colId)}
-                  >
-                    {renderCell(rowId, colId)}
-                  </td>
-                ) : (
-                  <Cell
-                    key={colId}
-                    rowId={rowId}
-                    colId={colId}
-                    selected={store?.getState().isCellSelected(rowId, colId) ?? false}
-                    pending={pendingPasteTarget ? isCellInRangeTarget(rowId, colId, pendingPasteTarget) : false}
-                    focused={cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId}
-                    onMouseDown={(event) => handleCellMouseDown(rowId, colId, event)}
-                    onMouseEnter={() => handleCellMouseEnter(rowId, colId)}
-                    {...cellProps}
-                  />
-                ),
-              )}
+              {schema.columnOrder.map((colId) => {
+                const tdClass = [
+                  'border border-(--dt-border) px-2 py-1 text-sm font-dt',
+                  store?.getState().isCellSelected(rowId, colId) ? 'bg-(--dt-row-hover)' : '',
+                  cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId ? 'ring-2 ring-(--dt-primary)' : '',
+                ].join(' ');
+                if (renderCell) {
+                  return (
+                    <td
+                      key={colId}
+                      className={tdClass}
+                      aria-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
+                      data-cell-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
+                      data-cell-pending={
+                        pendingPasteTarget && isCellInRangeTarget(rowId, colId, pendingPasteTarget) ? true : undefined
+                      }
+                      data-cell-focused={
+                        (cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId) || undefined
+                      }
+                      onMouseDown={(event) => handleCellMouseDown(rowId, colId, event)}
+                      onMouseEnter={() => handleCellMouseEnter(rowId, colId)}
+                    >
+                      {renderCell(rowId, colId)}
+                    </td>
+                  );
+                } else {
+                  return (
+                    <Cell
+                      key={colId}
+                      rowId={rowId}
+                      colId={colId}
+                      selected={store?.getState().isCellSelected(rowId, colId) ?? false}
+                      pending={pendingPasteTarget ? isCellInRangeTarget(rowId, colId, pendingPasteTarget) : false}
+                      focused={cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId}
+                      onMouseDown={(event) => handleCellMouseDown(rowId, colId, event)}
+                      onMouseEnter={() => handleCellMouseEnter(rowId, colId)}
+                      className={tdClass}
+                      {...cellProps}
+                    />
+                  );
+                }
+              })}
             </tr>
           );
         })}
