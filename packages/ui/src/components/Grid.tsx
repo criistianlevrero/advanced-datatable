@@ -394,14 +394,17 @@ export function Grid({
               />
             </th>
           )}
-          {schema.columnOrder.map((colId) => {
-            const col = schema.columns[colId];
-            const isSorted = sortState?.colId === colId;
-            const filter = filterState[colId];
-            const isFilterActive = hasActiveFilter(filter);
-            const isFilterMenuOpen = showFilters && openFilterColId === colId;
-            const isColumnResizable = resizableColumns && col?.meta?.resizable !== false;
-            return (
+              {schema.columnOrder.map((colId, colIdx) => {
+                const col = schema.columns[colId];
+                const isSorted = sortState?.colId === colId;
+                const filter = filterState[colId];
+                const isFilterActive = hasActiveFilter(filter);
+                const isFilterMenuOpen = showFilters && openFilterColId === colId;
+                const isColumnResizable = resizableColumns && col?.meta?.resizable !== false;
+                // Bordes redondeados en el primer y último th
+                const isFirstTh = selectable ? colIdx === 0 : colIdx === 0;
+                const isLastTh = colIdx === schema.columnOrder.length - 1;
+                return (
               <th
                 key={colId}
                 onMouseEnter={() => setHoveredResizableColId(colId)}
@@ -412,6 +415,8 @@ export function Grid({
                   'text-(--dt-header-color) font-dt',
                   'px-1', // padding left/right 0.25rem
                   'py-1', // padding top/bottom 0.25rem
+                  isFirstTh ? 'rounded-tl-[6px]' : '',
+                  isLastTh ? 'rounded-tr-[6px]' : '',
                 ].join(' ')}
                 title={`Sort by ${col?.title ?? colId}`}
               >
@@ -524,9 +529,9 @@ export function Grid({
       </thead>
 
       <tbody>
-        {rowOrder.map((rowId) => {
+        {rowOrder.map((rowId, rowIdx) => {
           const isSelected = selectedRowIds.has(rowId);
-          // const isLastRow = rowIdx === rowOrder.length - 1;
+          const isLastRow = rowIdx === rowOrder.length - 1;
           return (
             <tr
               key={rowId}
@@ -539,7 +544,7 @@ export function Grid({
               aria-selected={selectable ? isSelected : undefined}
             >
               {selectable && (
-                <td className="w-9 text-center">
+                <td className={["w-9 text-center", isLastRow ? "rounded-bl-[6px]" : ""].join(" ")}>
                   <input
                     type="checkbox"
                     checked={isSelected}
@@ -549,11 +554,16 @@ export function Grid({
                   />
                 </td>
               )}
-              {schema.columnOrder.map((colId) => {
+              {schema.columnOrder.map((colId, colIdx) => {
+                // Bordes redondeados en la última fila, primer y último td
+                const isFirstTd = selectable ? colIdx === 0 : colIdx === 0;
+                const isLastTd = colIdx === schema.columnOrder.length - 1;
                 const tdClass = [
                   'border border-(--dt-border) px-2 py-1 text-sm font-dt',
                   store?.getState().isCellSelected(rowId, colId) ? 'bg-(--dt-row-hover)' : '',
                   cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId ? 'ring-2 ring-(--dt-primary)' : '',
+                  isLastRow && isFirstTd ? 'rounded-bl-[6px]' : '',
+                  isLastRow && isLastTd ? 'rounded-br-[6px]' : '',
                 ].join(' ');
                 if (renderCell) {
                   return (
