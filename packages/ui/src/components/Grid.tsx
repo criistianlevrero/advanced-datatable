@@ -342,32 +342,24 @@ export function Grid({
       onKeyDown={handleKeyDown}
       onCopy={handleCopy}
       onPaste={handlePaste}
-      style={{ outline: "none", position: "relative" }}
+      className="outline-none relative"
       aria-label="Data grid clipboard region"
       aria-busy={isPastePending || undefined}
     >
       {isPastePending && (
         <div
           aria-live="polite"
-          style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 2,
-            width: "fit-content",
-            margin: "6px",
-            padding: "4px 8px",
-            borderRadius: "999px",
-            fontSize: "12px",
-            fontWeight: 600,
-            color: "#7a5a00",
-            background: "#fff1b8",
-            border: "1px solid #f6d365",
-          }}
+          className="sticky top-0 z-20 w-fit m-1.5 px-2 py-1 rounded-full text-xs font-semibold text-[#7a5a00] bg-[#fff1b8] border border-[#f6d365]"
         >
           Applying paste operation...
         </div>
       )}
-      <table className={className}>
+      <table
+        className={[
+          className,
+          'border-collapse border-none rounded-lg',
+        ].filter(Boolean).join(' ')}
+      >
       <colgroup>
         {selectable && <col style={{ width: 36 }} />}
         {schema.columnOrder.map((colId) => {
@@ -377,8 +369,10 @@ export function Grid({
       </colgroup>
       <thead>
         <tr
-          className={headerClassName}
-          style={{ border: '2px solid var(--dt-border)', borderRadius: 6, boxSizing: 'border-box' }}
+          className={[
+            headerClassName,
+            'border-none',
+          ].filter(Boolean).join(' ')}
         >
           {selectable && (
             <th className="w-9 text-center bg-(--dt-header-bg) text-(--dt-header-color) font-dt">
@@ -404,22 +398,24 @@ export function Grid({
                 // Bordes redondeados en el primer y último th
                 const isFirstTh = selectable ? colIdx === 0 : colIdx === 0;
                 const isLastTh = colIdx === schema.columnOrder.length - 1;
-                return (
-              <th
-                key={colId}
-                onMouseEnter={() => setHoveredResizableColId(colId)}
-                onMouseLeave={() => setHoveredResizableColId((prev) => (prev === colId ? null : prev))}
-                className={[
+                let thClass = [
                   'relative select-none whitespace-nowrap transition-colors',
                   isFilterActive ? 'bg-(--dt-header-bg) shadow-[inset_0_-2px_0_var(--dt-primary)]' : 'bg-(--dt-header-bg)',
                   'text-(--dt-header-color) font-dt',
-                  'px-1', // padding left/right 0.25rem
-                  'py-1', // padding top/bottom 0.25rem
-                  isFirstTh ? 'rounded-tl-[6px]' : '',
-                  isLastTh ? 'rounded-tr-[6px]' : '',
-                ].join(' ')}
-                title={`Sort by ${col?.title ?? colId}`}
-              >
+                  'px-1',
+                  'py-1',
+                  'border-none',
+                ];
+                if (isFirstTh) thClass.push('rounded-tl-lg');
+                if (isLastTh) thClass.push('rounded-tr-lg');
+                return (
+                  <th
+                    key={colId}
+                    onMouseEnter={() => setHoveredResizableColId(colId)}
+                    onMouseLeave={() => setHoveredResizableColId((prev) => (prev === colId ? null : prev))}
+                    className={thClass.join(' ')}
+                    title={`Sort by ${col?.title ?? colId}`}
+                  >
                 <div className="flex flex-row items-center gap-1.5 justify-between w-full">
                   <span className="truncate">{col?.title ?? colId}</span>
                   <div className="flex items-center gap-1 ml-auto">
@@ -472,18 +468,18 @@ export function Grid({
                   <div
                     role="presentation"
                     aria-hidden="true"
-                    style={{
-                      position: "absolute",
-                      top: 4,
-                      bottom: 4,
-                      right: 0,
-                      width: 2,
-                      borderRadius: 999,
-                      background: hoveredResizableColId === colId ? "#228be6" : "transparent",
-                      transition: "background-color 120ms ease",
-                      pointerEvents: "none",
-                      zIndex: 4,
-                    }}
+                    className={[
+                      'absolute',
+                      'top-1',
+                      'bottom-1',
+                      'right-0',
+                      'w-0.5',
+                      'rounded-full',
+                      hoveredResizableColId === colId ? 'bg-[#228be6]' : 'bg-transparent',
+                      'transition-colors',
+                      'pointer-events-none',
+                      'z-40',
+                    ].join(' ')}
                   />
                 )}
 
@@ -494,15 +490,7 @@ export function Grid({
                     data-column-resize-handle="true"
                     onMouseDown={(event) => startColumnResize(colId, event)}
                     onClick={(event) => event.stopPropagation()}
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      right: -2,
-                      width: 8,
-                      height: "100%",
-                      cursor: "col-resize",
-                      zIndex: 6,
-                    }}
+                    className="absolute top-0 right-[-2px] w-2 h-full cursor-col-resize z-60"
                   />
                 )}
 
@@ -540,11 +528,11 @@ export function Grid({
                 'transition-colors',
                 isSelected ? 'bg-(--dt-row-hover)' : 'bg-(--dt-bg)',
                 'hover:bg-(--dt-row-hover)',
-              ].join(' ')}
+              ].filter(Boolean).join(' ')}
               aria-selected={selectable ? isSelected : undefined}
             >
               {selectable && (
-                <td className={["w-9 text-center", isLastRow ? "rounded-bl-[6px]" : ""].join(" ")}>
+                <td className={['w-9 text-center border-none', isLastRow ? 'rounded-bl-lg' : ''].join(' ')}>
                   <input
                     type="checkbox"
                     checked={isSelected}
@@ -558,18 +546,19 @@ export function Grid({
                 // Bordes redondeados en la última fila, primer y último td
                 const isFirstTd = selectable ? colIdx === 0 : colIdx === 0;
                 const isLastTd = colIdx === schema.columnOrder.length - 1;
-                const tdClass = [
-                  'border border-(--dt-border) px-2 py-1 text-sm font-dt',
+                let tdClass = [
+                  'px-2 py-1 text-sm font-dt',
+                  'border-none',
                   store?.getState().isCellSelected(rowId, colId) ? 'bg-(--dt-row-hover)' : '',
-                  cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId ? 'ring-2 ring-(--dt-primary)' : '',
-                  isLastRow && isFirstTd ? 'rounded-bl-[6px]' : '',
-                  isLastRow && isLastTd ? 'rounded-br-[6px]' : '',
-                ].join(' ');
+                  cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId ? 'ring-2 ring-(--dt-primary) z-[1] relative' : '',
+                ];
+                if (isLastRow && isFirstTd) tdClass.push('rounded-bl-lg');
+                if (isLastRow && isLastTd) tdClass.push('rounded-br-lg');
                 if (renderCell) {
                   return (
                     <td
                       key={colId}
-                      className={tdClass}
+                      className={tdClass.join(' ')}
                       aria-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
                       data-cell-selected={store?.getState().isCellSelected(rowId, colId) || undefined}
                       data-cell-pending={
@@ -595,7 +584,7 @@ export function Grid({
                       focused={cellSelection.focus?.rowId === rowId && cellSelection.focus.colId === colId}
                       onMouseDown={(event) => handleCellMouseDown(rowId, colId, event)}
                       onMouseEnter={() => handleCellMouseEnter(rowId, colId)}
-                      className={tdClass}
+                      className={tdClass.join(' ')}
                       {...cellProps}
                     />
                   );
