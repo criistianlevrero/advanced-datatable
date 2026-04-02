@@ -61,9 +61,10 @@ export function VirtualizationExample(): React.ReactElement {
         {...props}
         height="600px"
         estimateSize={40}
-        overscan={10}
+        overscan={6}
         selectable={true}
         showFilters={true}
+        stickyHeader={true}
         resizableColumns={true}
       />
     ),

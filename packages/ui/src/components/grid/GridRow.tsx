@@ -7,6 +7,7 @@ import { isCellInRangeTarget } from "./grid.helpers";
 
 export interface GridRowProps {
   rowId: string;
+  rowRef?: React.Ref<HTMLTableRowElement>;
   isLastRow: boolean;
   isSelected: boolean;
   columnOrder: string[];
@@ -25,6 +26,7 @@ export interface GridRowProps {
 
 export function GridRow({
   rowId,
+  rowRef,
   isLastRow,
   isSelected,
   columnOrder,
@@ -42,6 +44,7 @@ export function GridRow({
 }: GridRowProps): React.ReactElement {
   return (
     <tr
+      ref={rowRef}
       className={[
         rowClassName,
         "transition-colors",

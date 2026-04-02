@@ -34,7 +34,7 @@ export interface GridVirtualizedProps {
   height: string;
   /** Estimated height of each row in pixels (default: 40) */
   estimateSize?: number;
-  /** Number of items to render outside of visible area (default: 10) */
+  /** Number of items to render outside of visible area (default: 6) */
   overscan?: number;
   /** Enables header drag-resize for columns (default: false). */
   resizableColumns?: boolean;
@@ -42,6 +42,8 @@ export interface GridVirtualizedProps {
   selectable?: boolean;
   /** Render a filter input row below the column headers. */
   showFilters?: boolean;
+  /** Keep table header fixed while scrolling vertically. */
+  stickyHeader?: boolean;
   /** Override header renderer. */
   HeaderComponent?: React.ComponentType<GridHeaderProps>;
   /** Override row renderer. */
@@ -60,10 +62,11 @@ export function GridVirtualized({
   rowClassName,
   height,
   estimateSize = 40,
-  overscan = 10,
+  overscan = 6,
   resizableColumns = false,
   selectable = false,
   showFilters = false,
+  stickyHeader = false,
   HeaderComponent,
   RowComponent,
   CellComponent,
@@ -87,9 +90,25 @@ export function GridVirtualized({
   const filterMenuRef = React.useRef<HTMLDivElement | null>(null);
   const resizingRef = React.useRef<{ colId: string; startX: number; startWidth: number } | null>(null);
 
-  const allVisibleSelected =
-    rowOrder.length > 0 && rowOrder.every((id) => selectedRowIds.has(id));
-  const someSelected = rowOrder.some((id) => selectedRowIds.has(id));
+  // Keep selection summary cheap during scroll updates.
+  const visibleRowIdSet = React.useMemo(() => new Set(rowOrder), [rowOrder]);
+  const { allVisibleSelected, someSelected } = React.useMemo(() => {
+    if (rowOrder.length === 0 || selectedRowIds.size === 0) {
+      return { allVisibleSelected: false, someSelected: false };
+    }
+
+    let visibleSelectedCount = 0;
+    for (const rowId of selectedRowIds) {
+      if (visibleRowIdSet.has(rowId)) {
+        visibleSelectedCount += 1;
+      }
+    }
+
+    return {
+      allVisibleSelected: visibleSelectedCount === rowOrder.length,
+      someSelected: visibleSelectedCount > 0,
+    };
+  }, [rowOrder.length, selectedRowIds, visibleRowIdSet]);
 
   // Setup virtualizer for rows
   const rowVirtualizer = useVirtualizer({
@@ -97,10 +116,16 @@ export function GridVirtualized({
     getScrollElement: () => containerRef.current,
     estimateSize: () => estimateSize,
     overscan,
+    getItemKey: (index) => rowOrder[index] ?? index,
   });
 
   const virtualRows = rowVirtualizer.getVirtualItems();
   const totalSize = rowVirtualizer.getTotalSize();
+
+  const isCellSelected = React.useCallback(
+    (rowId: string, colId: string) => store?.getState().isCellSelected(rowId, colId) ?? false,
+    [store],
+  );
 
   React.useEffect(() => {
     if (!isDraggingSelection) {
@@ -406,6 +431,7 @@ export function GridVirtualized({
           sortState={sortState}
           filterState={filterState}
           headerClassName={headerClassName}
+          stickyHeader={stickyHeader}
           selectable={selectable}
           allVisibleSelected={allVisibleSelected}
           someSelected={someSelected}
@@ -446,7 +472,7 @@ export function GridVirtualized({
                     cellProps={cellProps}
                     cellSelection={cellSelection}
                     pendingPasteTarget={pendingPasteTarget}
-                    isCellSelected={(r, c) => store?.getState().isCellSelected(r, c) ?? false}
+                    isCellSelected={isCellSelected}
                     onToggleRowSelection={() => store?.getState().toggleRowSelection(rowId)}
                     renderCell={renderCell}
                     CellComponent={CellComponent}

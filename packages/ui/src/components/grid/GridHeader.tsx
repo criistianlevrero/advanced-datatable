@@ -12,6 +12,7 @@ export interface GridHeaderProps {
   sortState: SortState | null;
   filterState: FilterState;
   headerClassName?: string;
+  stickyHeader?: boolean;
   selectable: boolean;
   allVisibleSelected: boolean;
   someSelected: boolean;
@@ -36,6 +37,7 @@ export function GridHeader({
   sortState,
   filterState,
   headerClassName,
+  stickyHeader = false,
   selectable,
   allVisibleSelected,
   someSelected,
@@ -54,6 +56,8 @@ export function GridHeader({
   onStartColumnResize,
   FilterMenuComponent = GridFilterMenu,
 }: GridHeaderProps): React.ReactElement {
+  const stickyHeaderClass = stickyHeader ? "sticky top-0 z-30" : "";
+
   return (
     <thead>
       <tr
@@ -63,7 +67,12 @@ export function GridHeader({
         ].filter(Boolean).join(" ")}
       >
         {selectable && (
-          <th className="w-9 text-center bg-(--dt-header-bg) text-(--dt-header-color) font-dt">
+          <th
+            className={[
+              "w-9 text-center bg-(--dt-header-bg) text-(--dt-header-color) font-dt",
+              stickyHeaderClass,
+            ].join(" ")}
+          >
             <input
               type="checkbox"
               checked={allVisibleSelected}
@@ -95,6 +104,7 @@ export function GridHeader({
             "px-1",
             "py-1",
             "border-none",
+            stickyHeaderClass,
           ];
 
           if (isFirstTh) {

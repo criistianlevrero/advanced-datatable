@@ -35,6 +35,8 @@ export interface GridProps {
   selectable?: boolean;
   /** Render a filter input row below the column headers. */
   showFilters?: boolean;
+  /** Keep table header fixed while scrolling vertically. */
+  stickyHeader?: boolean;
   /** Override header renderer. */
   HeaderComponent?: React.ComponentType<GridHeaderProps>;
   /** Override row renderer. */
@@ -54,6 +56,7 @@ export function Grid({
   resizableColumns = false,
   selectable = false,
   showFilters = false,
+  stickyHeader = false,
   HeaderComponent,
   RowComponent,
   CellComponent,
@@ -77,9 +80,24 @@ export function Grid({
   const filterMenuRef = React.useRef<HTMLDivElement | null>(null);
   const resizingRef = React.useRef<{ colId: string; startX: number; startWidth: number } | null>(null);
 
-  const allVisibleSelected =
-    rowOrder.length > 0 && rowOrder.every((id) => selectedRowIds.has(id));
-  const someSelected = rowOrder.some((id) => selectedRowIds.has(id));
+  const visibleRowIdSet = React.useMemo(() => new Set(rowOrder), [rowOrder]);
+  const { allVisibleSelected, someSelected } = React.useMemo(() => {
+    if (rowOrder.length === 0 || selectedRowIds.size === 0) {
+      return { allVisibleSelected: false, someSelected: false };
+    }
+
+    let visibleSelectedCount = 0;
+    for (const rowId of selectedRowIds) {
+      if (visibleRowIdSet.has(rowId)) {
+        visibleSelectedCount += 1;
+      }
+    }
+
+    return {
+      allVisibleSelected: visibleSelectedCount === rowOrder.length,
+      someSelected: visibleSelectedCount > 0,
+    };
+  }, [rowOrder.length, selectedRowIds, visibleRowIdSet]);
 
   React.useEffect(() => {
     if (!isDraggingSelection) {
@@ -383,6 +401,7 @@ export function Grid({
         sortState={sortState}
         filterState={filterState}
         headerClassName={headerClassName}
+        stickyHeader={stickyHeader}
         selectable={selectable}
         allVisibleSelected={allVisibleSelected}
         someSelected={someSelected}
