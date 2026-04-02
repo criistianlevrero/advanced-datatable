@@ -25,6 +25,24 @@ const { createConfig } = await import(
 const TEST_PORT = 3099;
 const BASE_URL = `http://localhost:${TEST_PORT}`;
 
+async function waitForCondition(
+  predicate: () => boolean,
+  options: { timeoutMs?: number; intervalMs?: number } = {},
+): Promise<void> {
+  const timeoutMs = options.timeoutMs ?? 1500;
+  const intervalMs = options.intervalMs ?? 20;
+  const start = Date.now();
+
+  while (Date.now() - start < timeoutMs) {
+    if (predicate()) {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error(`waitForCondition timeout after ${timeoutMs}ms`);
+}
+
 function makeManager() {
   const engine = new TableEngineImpl({
     schema: {
@@ -101,7 +119,7 @@ describe("HttpTransport + OperationManagerImpl integration", () => {
 
     manager.apply(makeSetCellOp("op-e2e-1", "Updated"));
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await waitForCondition(() => confirmedOps.includes("op-e2e-1"));
 
     expect(confirmedOps).toContain("op-e2e-1");
     expect(manager.getPendingOperations()).toHaveLength(0);
@@ -119,7 +137,7 @@ describe("HttpTransport + OperationManagerImpl integration", () => {
       manager.apply(makeSetCellOp(`op-batch-${i}`, `Val${i}`));
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await waitForCondition(() => confirmedOps.length === 5);
 
     expect(confirmedOps).toHaveLength(5);
     expect(manager.getPendingOperations()).toHaveLength(0);
@@ -142,7 +160,7 @@ describe("HttpTransport + OperationManagerImpl integration", () => {
 
     manager.apply(makeSetCellOp("op-fail-1", "ShouldFail"));
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForCondition(() => failedOps.includes("op-fail-1"));
 
     expect(failedOps).toContain("op-fail-1");
     expect(manager.getPendingOperations()).toHaveLength(0);
@@ -171,7 +189,7 @@ describe("HttpTransport + OperationManagerImpl integration", () => {
       manager.apply(makeSetCellOp(`op-partial-${i}`, `P${i}`));
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await waitForCondition(() => confirmedOps.length + failedOps.length === 3);
 
     expect(confirmedOps.length + failedOps.length).toBe(3);
     expect(failedOps.length).toBeGreaterThan(0);
@@ -193,7 +211,7 @@ describe("HttpTransport + OperationManagerImpl integration", () => {
 
     manager.apply(makeSetCellOp("op-conflict-1", "ConflictValue"));
 
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await waitForCondition(() => failedOps.includes("op-conflict-1"));
 
     expect(failedOps).toContain("op-conflict-1");
     expect(manager.getPendingOperations()).toHaveLength(0);
@@ -223,7 +241,7 @@ describe("HttpTransport + OperationManagerImpl integration", () => {
 
     manager.apply(makeSetCellOp("op-replay-1", "ReplayTest"));
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await waitForCondition(() => confirmedOps.includes("op-replay-1"));
 
     expect(confirmedOps).toContain("op-replay-1");
     expect(manager.getPendingOperations()).toHaveLength(0);
