@@ -3,6 +3,7 @@ import { DataTable } from "@advanced-datatable/ui";
 import type { BatchResponse, IOperationTransport } from "@advanced-datatable/api-client";
 import type { Operation } from "@advanced-datatable/core";
 import type { IOperationManager } from "@advanced-datatable/operations";
+import { Alert, Button, Card, Group, List, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { basicState } from "../mocks/data";
 
 type ErrorMode = "none" | "4xx" | "5xx" | "timeout";
@@ -70,43 +71,41 @@ export function ErrorRecoveryExample(): React.ReactElement {
 
   return (
     <section>
-      <h2>Error Recovery</h2>
-      <p>
+      <Title order={2}>Error Recovery</Title>
+      <Text mb="md">
         This example demonstrates non-retryable failures versus retryable transport failures that
         recover automatically on the next attempt.
-      </p>
+      </Text>
 
-      <div style={{ marginBottom: 16, padding: 16, backgroundColor: "#fff3cd", borderRadius: 6 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(220px, 1fr))", gap: 8 }}>
-          <button onClick={() => updateMode("none")}>Normal</button>
-          <button onClick={() => updateMode("4xx")}>400 Non-Retryable</button>
-          <button onClick={() => updateMode("5xx")}>503 Retry Once</button>
-          <button onClick={() => updateMode("timeout")}>Timeout Retry Once</button>
-        </div>
-        <p style={{ marginTop: 12, marginBottom: 0 }}>
-          <strong>Current mode:</strong> {errorMode}
-        </p>
-      </div>
+      <Alert color="yellow" mb="md">
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
+          <Button variant="default" onClick={() => updateMode("none")}>Normal</Button>
+          <Button variant="default" onClick={() => updateMode("4xx")}>400 Non-Retryable</Button>
+          <Button variant="default" onClick={() => updateMode("5xx")}>503 Retry Once</Button>
+          <Button variant="default" onClick={() => updateMode("timeout")}>Timeout Retry Once</Button>
+        </SimpleGrid>
+        <Text mt="sm" fw={600}>Current mode: {errorMode}</Text>
+      </Alert>
 
       {(failedOps.length > 0 || recoveredOps.length > 0) && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(240px, 1fr))", gap: 12, marginBottom: 16 }}>
-          <div style={{ padding: 16, backgroundColor: "#fde2e1", borderRadius: 6 }}>
-            <h4>Failed Operations</h4>
-            <ul>
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" mb="md">
+          <Card withBorder radius="md" bg="red.0">
+            <Title order={4} mb="xs">Failed Operations</Title>
+            <List spacing={4} size="sm">
               {failedOps.map((opId) => (
-                <li key={opId}>{opId}</li>
+                <List.Item key={opId}>{opId}</List.Item>
               ))}
-            </ul>
-          </div>
-          <div style={{ padding: 16, backgroundColor: "#d9f5e5", borderRadius: 6 }}>
-            <h4>Recovered After Retry</h4>
-            <ul>
+            </List>
+          </Card>
+          <Card withBorder radius="md" bg="green.0">
+            <Title order={4} mb="xs">Recovered After Retry</Title>
+            <List spacing={4} size="sm">
               {recoveredOps.map((opId) => (
-                <li key={opId}>{opId}</li>
+                <List.Item key={opId}>{opId}</List.Item>
               ))}
-            </ul>
-          </div>
-        </div>
+            </List>
+          </Card>
+        </SimpleGrid>
       )}
 
       <DataTable

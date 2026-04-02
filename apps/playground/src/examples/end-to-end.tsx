@@ -73,7 +73,7 @@ function EndToEndControls(): React.ReactElement {
         <div>
           <Title order={4}>Manual Operations</Title>
           <Text size="sm" c="dimmed">
-            Útil para validar confirmaciones normales y el conflicto controlado por opId.
+            Useful for validating normal confirmations and the controlled conflict by opId.
           </Text>
         </div>
         <Badge variant="light" color="orange">{CONFLICT_OP_ID}</Badge>
@@ -107,7 +107,7 @@ export function EndToEndExample(): React.ReactElement {
       <div>
         <Title order={3}>End-to-End HTTP Demo</Title>
         <Text c="dimmed" mt="sm">
-          Esta vista usa <Code>HttpTransport</Code> contra el backend real. La configuración se comparte desde el drawer global.
+          This view uses <Code>HttpTransport</Code> against the real backend. Configuration is shared from the global drawer.
         </Text>
       </div>
 
@@ -128,13 +128,13 @@ export function EndToEndExample(): React.ReactElement {
 
       {backendStatus === "offline" ? (
         <Alert color="yellow">
-          El backend no está corriendo. Ejecutá <Code>npm run mock-backend</Code> y luego refrescá el estado.
+          The backend is not running. Run <Code>npm run mock-backend</Code> and then refresh status.
         </Alert>
       ) : null}
 
       {appliedConfig ? (
         <Alert color="blue">
-          Config actual: latency {appliedConfig.latencyMs} ms, errors {(appliedConfig.errorRate * 100).toFixed(0)}%,
+          Current config: latency {appliedConfig.latencyMs} ms, errors {(appliedConfig.errorRate * 100).toFixed(0)}%,
           partial {appliedConfig.partialResponseMode ? "on" : "off"}, conflicts {appliedConfig.conflictOpIds.length}.
         </Alert>
       ) : null}

@@ -2,6 +2,8 @@ import React from "react";
 import { Button, Card, Group, SimpleGrid, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconArrowsShuffle, IconKeyboard, IconPlugConnected, IconTable } from "@tabler/icons-react";
 import { Link, Route, Routes } from "react-router-dom";
+import { DataTable, Grid } from "@advanced-datatable/ui";
+import type { TableState } from "@advanced-datatable/core";
 import { BasicExample } from "./examples/basic";
 import { BulkEditExample } from "./examples/bulk-edit";
 import { SchemaDynamicExample } from "./examples/schema-dynamic";
@@ -11,6 +13,52 @@ import { PartialResponseExample } from "./examples/partial-response";
 import { EndToEndExample } from "./examples/end-to-end";
 import { SelectionLabExample } from "./examples/selection-lab";
 import { VirtualizationExample } from "./examples/virtualization";
+import { mockTransport } from "./mocks/mockTransport";
+
+const overviewPreviewState: Partial<TableState> = {
+  schema: {
+    columns: {
+      name: { id: "name", type: "string", title: "Name" },
+      role: { id: "role", type: "string", title: "Role" },
+      team: { id: "team", type: "string", title: "Team" },
+      region: { id: "region", type: "string", title: "Region" },
+      status: { id: "status", type: "string", title: "Status" },
+      age: { id: "age", type: "number", title: "Age" },
+      score: { id: "score", type: "number", title: "Score" },
+      active: { id: "active", type: "boolean", title: "Active" },
+    },
+    columnOrder: ["name", "role", "team", "region", "status", "age", "score", "active"],
+    version: 1,
+  },
+  rows: new Map(
+    Array.from({ length: 23 }, (_, index) => {
+      const rowNumber = index + 1;
+      const rowId = `overview-r${rowNumber}`;
+      const roles = ["Engineer", "Designer", "Analyst", "Manager"];
+      const teams = ["Core", "Growth", "Platform", "Data"];
+      const regions = ["NA", "LATAM", "EMEA", "APAC"];
+      const statuses = ["New", "Active", "Review", "Done"];
+
+      return [
+        rowId,
+        {
+          id: rowId,
+          cells: {
+            name: { value: `Person ${rowNumber}` },
+            role: { value: roles[index % roles.length] },
+            team: { value: teams[index % teams.length] },
+            region: { value: regions[index % regions.length] },
+            status: { value: statuses[index % statuses.length] },
+            age: { value: 22 + (index % 18) },
+            score: { value: 70 + ((index * 3) % 31) },
+            active: { value: index % 2 === 0 },
+          },
+        },
+      ] as const;
+    }),
+  ),
+  rowOrder: Array.from({ length: 23 }, (_, index) => `overview-r${index + 1}`),
+};
 
 function OverviewPage(): React.ReactElement {
   return (
@@ -18,7 +66,7 @@ function OverviewPage(): React.ReactElement {
       <div>
         <Title order={1}>Advanced DataTable Playground</Title>
         <Text c="dimmed" mt="sm">
-          Navegá por categorías de tests para validar operaciones base, resiliencia y escenarios con backend real.
+          Navigate test categories to validate core operations, resilience, and real-backend scenarios.
         </Text>
       </div>
 
@@ -31,7 +79,7 @@ function OverviewPage(): React.ReactElement {
             <Title order={3}>Core Scenarios</Title>
           </Group>
           <Text c="dimmed" mb="md">
-            Edición básica, operaciones en lote y cambios de esquema.
+            Basic editing, bulk operations, and schema changes.
           </Text>
           <Button component={Link} to="/core" variant="light">
             Open core tests
@@ -46,7 +94,7 @@ function OverviewPage(): React.ReactElement {
             <Title order={3}>Resilience Scenarios</Title>
           </Group>
           <Text c="dimmed" mb="md">
-            Replay, recuperación frente a errores y respuestas parciales.
+            Replay, error recovery, and partial responses.
           </Text>
           <Button component={Link} to="/resilience" variant="light" color="orange">
             Open resilience tests
@@ -61,7 +109,7 @@ function OverviewPage(): React.ReactElement {
             <Title order={3}>Backend Integration</Title>
           </Group>
           <Text c="dimmed" mb="md">
-            Demo end-to-end con HTTP real y configuración global del backend.
+            End-to-end demo with real HTTP and global backend configuration.
           </Text>
           <Button component={Link} to="/backend" variant="light" color="teal">
             Open backend tests
@@ -76,7 +124,7 @@ function OverviewPage(): React.ReactElement {
             <Title order={3}>Selection Lab</Title>
           </Group>
           <Text c="dimmed" mb="md">
-            Escenario dedicado a selección, atajos de teclado y copy/paste con read-only.
+            Dedicated scenario for selection, keyboard shortcuts, and copy/paste with read-only constraints.
           </Text>
           <Button component={Link} to="/selection-lab" variant="light" color="grape">
             Open selection lab
@@ -91,13 +139,31 @@ function OverviewPage(): React.ReactElement {
             <Title order={3}>Virtualization</Title>
           </Group>
           <Text c="dimmed" mb="md">
-            10,000 filas virtualizadas con @tanstack/react-virtual para rendimiento óptimo.
+            10,000 virtualized rows with @tanstack/react-virtual for optimal performance.
           </Text>
           <Button component={Link} to="/virtualization" variant="light" color="violet">
             Open virtualization demo
           </Button>
         </Card>
       </SimpleGrid>
+
+      <Card withBorder radius="md" padding="lg">
+        <Stack gap="md">
+          <div>
+            <Title order={3}>Interactive Table Preview</Title>
+            <Text c="dimmed" mt="xs">
+              This sample table showcases the core interactive features: sorting by clicking column
+              headers, filtering with per-column filter inputs, and column resize using header
+              drag handles. The grid is also editable and supports copy/paste across selected
+              regions.
+            </Text>
+          </div>
+
+          <DataTable transport={mockTransport} initialState={overviewPreviewState}>
+            <Grid showFilters resizableColumns />
+          </DataTable>
+        </Stack>
+      </Card>
     </Stack>
   );
 }
@@ -107,7 +173,7 @@ function CorePage(): React.ReactElement {
     <Stack gap="xl">
       <div>
         <Title order={2}>Core Scenarios</Title>
-        <Text c="dimmed">Validación de edición, bulk operations y cambios dinámicos de schema.</Text>
+        <Text c="dimmed">Validation of editing, bulk operations, and dynamic schema changes.</Text>
       </div>
       <BasicExample />
       <BulkEditExample />
@@ -121,7 +187,7 @@ function ResiliencePage(): React.ReactElement {
     <Stack gap="xl">
       <div>
         <Title order={2}>Resilience Scenarios</Title>
-        <Text c="dimmed">Simulaciones locales para reconexión, errores retryable y respuestas incompletas.</Text>
+        <Text c="dimmed">Local simulations for reconnect, retryable errors, and incomplete responses.</Text>
       </div>
       <ReplayOnReconnectExample />
       <ErrorRecoveryExample />
@@ -136,7 +202,7 @@ function BackendPage(): React.ReactElement {
       <div>
         <Title order={2}>Backend Integration</Title>
         <Text c="dimmed">
-          Esta ruta usa el backend mock real. El drawer global permite cambiar su configuración sin salir de la vista.
+          This route uses the real mock backend. The global drawer lets you change config without leaving the view.
         </Text>
       </div>
       <EndToEndExample />
@@ -150,7 +216,7 @@ function SelectionLabPage(): React.ReactElement {
       <div>
         <Title order={2}>Selection Lab</Title>
         <Text c="dimmed">
-          Tabla grande (10x30) para validar selección, navegación por teclado, copy/paste y restricciones read-only.
+          Large table (10x30) for validating selection, keyboard navigation, copy/paste, and read-only constraints.
         </Text>
       </div>
       <SelectionLabExample />
@@ -164,7 +230,7 @@ function VirtualizationPage(): React.ReactElement {
       <div>
         <Title order={2}>Virtualization</Title>
         <Text c="dimmed">
-          Demo de 10,000 filas virtualizadas usando @tanstack/react-virtual. Todas las funcionalidades (sort, filter, select, edit) funcionan sin degradación de rendimiento.
+          Demo with 10,000 virtualized rows using @tanstack/react-virtual. All features (sort, filter, select, edit) work without performance degradation.
         </Text>
       </div>
       <VirtualizationExample />

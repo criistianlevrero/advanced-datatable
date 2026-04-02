@@ -53,13 +53,13 @@ export function BackendConfigDrawer({ opened, onClose }: BackendConfigDrawerProp
 
         <Alert color={backendStatus === "online" ? "teal" : "yellow"}>
           {backendStatus === "online"
-            ? "La configuración de este panel queda disponible en cualquier ruta del playground."
-            : "El backend no responde. Ejecutá npm run mock-backend para habilitar las rutas integradas."}
+            ? "Configuration from this panel is available on any playground route."
+            : "The backend is not responding. Run npm run mock-backend to enable integrated routes."}
         </Alert>
 
         {appliedConfig ? (
           <Text size="sm" c="dimmed">
-            Activo ahora: latencia {appliedConfig.latencyMs} ms, errores {(appliedConfig.errorRate * 100).toFixed(0)}%,
+            Active now: latency {appliedConfig.latencyMs} ms, errors {(appliedConfig.errorRate * 100).toFixed(0)}%,
             partial {appliedConfig.partialResponseMode ? "on" : "off"}, conflicts {appliedConfig.conflictOpIds.length}
           </Text>
         ) : null}
@@ -96,7 +96,7 @@ export function BackendConfigDrawer({ opened, onClose }: BackendConfigDrawerProp
             setPendingConfig((prev) => ({ ...prev, partialResponseMode: event.currentTarget.checked }))
           }
           label="Partial response mode"
-          description="El backend omite algunos resultados y el manager debe marcarlos como failed."
+          description="The backend omits some results and the manager must mark them as failed."
         />
 
         <Switch
@@ -108,7 +108,7 @@ export function BackendConfigDrawer({ opened, onClose }: BackendConfigDrawerProp
             }))
           }
           label="Conflict mode"
-          description={`Rechaza la operación manual con opId ${CONFLICT_OP_ID}.`}
+          description={`Rejects the manual operation with opId ${CONFLICT_OP_ID}.`}
         />
 
         <Group justify="space-between">

@@ -98,7 +98,7 @@ function PlaygroundShell(): React.ReactElement {
             <Burger opened={navOpened} onClick={toggleNav} hiddenFrom="sm" size="sm" />
             <div>
               <Title order={3}>Advanced DataTable Demo</Title>
-              <Text size="sm" c="dimmed">Categorías de tests y backend compartido</Text>
+              <Text size="sm" c="dimmed">Test categories and shared backend</Text>
             </div>
           </Group>
 

@@ -4,6 +4,7 @@ import type { BatchResponse, IOperationTransport } from "@advanced-datatable/api
 import type { Operation } from "@advanced-datatable/core";
 import { LocalStorageOperationPersistence } from "@advanced-datatable/operations";
 import type { IConnectivityMonitor, IOperationManager } from "@advanced-datatable/operations";
+import { Alert, Button, Group, Text, Title } from "@mantine/core";
 import { basicState } from "../mocks/data";
 
 export function ReplayOnReconnectExample(): React.ReactElement {
@@ -83,31 +84,23 @@ export function ReplayOnReconnectExample(): React.ReactElement {
 
   return (
     <section>
-      <h2>Replay On Reconnect</h2>
-      <p>
+      <Title order={2}>Replay On Reconnect</Title>
+      <Text mb="md">
         This example simulates offline edits. While disconnected, operations remain pending and are
         persisted locally. When connectivity returns, the manager replays them automatically.
-      </p>
+      </Text>
 
-      <div
-        style={{
-          marginBottom: 16,
-          padding: 16,
-          borderRadius: 6,
-          backgroundColor: isOnline ? "#d9f5e5" : "#fde2e1",
-          borderLeft: `4px solid ${isOnline ? "#1f8f5f" : "#c0392b"}`,
-        }}
-      >
-        <p><strong>Status:</strong> {statusMessage}</p>
-        <p><strong>Connection:</strong> {isOnline ? "Online" : "Offline"}</p>
-        <p><strong>Pending operations:</strong> {pendingOps}</p>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button onClick={toggleConnectivity}>
+      <Alert color={isOnline ? "teal" : "red"} mb="md">
+        <Text fw={600}>Status: {statusMessage}</Text>
+        <Text>Connection: {isOnline ? "Online" : "Offline"}</Text>
+        <Text mb="sm">Pending operations: {pendingOps}</Text>
+        <Group gap="xs">
+          <Button variant="default" onClick={toggleConnectivity}>
             {isOnline ? "Go Offline" : "Come Back Online"}
-          </button>
-          <button onClick={() => void clearPersistedQueue()}>Clear Persisted Queue</button>
-        </div>
-      </div>
+          </Button>
+          <Button variant="default" onClick={() => void clearPersistedQueue()}>Clear Persisted Queue</Button>
+        </Group>
+      </Alert>
 
       <DataTable
         transport={transport}

@@ -12,32 +12,32 @@ export function SelectionLabExample(): React.ReactElement {
         <div>
           <Title order={3} className="text-red-500">Selection and Paste Lab (10 x 30)</Title>
           <Text c="dimmed" size="sm">
-            Tabla de prueba para selección por rango, copy/paste y comportamiento con columnas/celdas read-only.
+            Test table for range selection, copy/paste, and behavior with read-only columns and cells.
           </Text>
         </div>
 
         <Card withBorder radius="md" padding="md">
           <Group mb="xs">
             <IconInfoCircle size={18} />
-            <Title order={5}>Instrucciones de navegación por teclado</Title>
+            <Title order={5}>Keyboard navigation instructions</Title>
           </Group>
           <List size="sm" spacing={4}>
-            <List.Item>Click para seleccionar celda activa</List.Item>
-            <List.Item>Shift + click o Shift + flechas para extender selección</List.Item>
-            <List.Item>Ctrl/Cmd + click para agregar rango independiente</List.Item>
-            <List.Item>Flechas para mover foco</List.Item>
-            <List.Item>Tab y Shift + Tab para navegar horizontalmente</List.Item>
-            <List.Item>Ctrl/Cmd + A para seleccionar el rango visible completo</List.Item>
-            <List.Item>Ctrl/Cmd + C y Ctrl/Cmd + V para copiar/pegar TSV</List.Item>
-            <List.Item>Enter para editar celda activa (si no es read-only)</List.Item>
-            <List.Item>Escape para limpiar selección de celdas</List.Item>
+            <List.Item>Click to select the active cell</List.Item>
+            <List.Item>Shift + click or Shift + arrows to extend selection</List.Item>
+            <List.Item>Ctrl/Cmd + click to add an independent range</List.Item>
+            <List.Item>Use arrows to move focus</List.Item>
+            <List.Item>Tab and Shift + Tab to navigate horizontally</List.Item>
+            <List.Item>Ctrl/Cmd + A to select the full visible range</List.Item>
+            <List.Item>Ctrl/Cmd + C and Ctrl/Cmd + V to copy/paste TSV</List.Item>
+            <List.Item>Enter to edit the active cell (if not read-only)</List.Item>
+            <List.Item>Escape to clear cell selection</List.Item>
           </List>
         </Card>
 
-        <Alert color="gray" variant="light" title="Read-only configurado para pruebas">
-          <Text size="sm">Columnas read-only: ID y Status.</Text>
-          <Text size="sm">Celdas read-only: algunas celdas en Notes (cada 5 filas).</Text>
-          <Text size="sm">Columnas no-resizeables: ID y Status. El resto se puede redimensionar desde el header.</Text>
+        <Alert color="gray" variant="light" title="Read-only setup for testing">
+          <Text size="sm">Read-only columns: ID and Status.</Text>
+          <Text size="sm">Read-only cells: some cells in Notes (every 5 rows).</Text>
+          <Text size="sm">Non-resizable columns: ID and Status. The rest can be resized from the header.</Text>
         </Alert>
           <DataTable
             transport={mockTransport}

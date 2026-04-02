@@ -3,7 +3,7 @@ import { DataTable, Grid } from "@advanced-datatable/ui";
 import { DataTableContext, useDataTable } from "@advanced-datatable/react";
 import { basicState } from "../mocks/data";
 import { mockTransport } from "../mocks/mockTransport";
-import { Title } from "@mantine/core";
+import { Title, Button } from "@mantine/core";
 
 function BulkControls() {
   const store = useContext(DataTableContext);
@@ -20,7 +20,7 @@ function BulkControls() {
 
   return (
     <div style={{ marginBottom: 8 }}>
-      <button onClick={handleBulkUpdate}>Set all Active = true</button>
+      <Button onClick={handleBulkUpdate}>Set all Active = true</Button>
     </div>
   );
 }
