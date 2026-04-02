@@ -87,11 +87,13 @@ export function GridVirtualized({
   const [pendingPasteTarget, setPendingPasteTarget] = React.useState<TargetDescriptor | null>(null);
   const [openFilterColId, setOpenFilterColId] = React.useState<string | null>(null);
   const [hoveredResizableColId, setHoveredResizableColId] = React.useState<string | null>(null);
+  const [isNearBottom, setIsNearBottom] = React.useState(false);
   const filterMenuRef = React.useRef<HTMLDivElement | null>(null);
   const resizingRef = React.useRef<{ colId: string; startX: number; startWidth: number } | null>(null);
 
   // Keep selection summary cheap during scroll updates.
   const visibleRowIdSet = React.useMemo(() => new Set(rowOrder), [rowOrder]);
+  const columnSpan = schema.columnOrder.length + (selectable ? 1 : 0);
   const { allVisibleSelected, someSelected } = React.useMemo(() => {
     if (rowOrder.length === 0 || selectedRowIds.size === 0) {
       return { allVisibleSelected: false, someSelected: false };
@@ -115,12 +117,48 @@ export function GridVirtualized({
     count: rowOrder.length,
     getScrollElement: () => containerRef.current,
     estimateSize: () => estimateSize,
+    measureElement: (el) => el?.getBoundingClientRect().height ?? estimateSize,
     overscan,
     getItemKey: (index) => rowOrder[index] ?? index,
   });
 
   const virtualRows = rowVirtualizer.getVirtualItems();
   const totalSize = rowVirtualizer.getTotalSize();
+
+  const renderedVirtualRows = React.useMemo(() => {
+    if (rowOrder.length === 0) {
+      return [] as Array<{ index: number; start: number; end: number }>;
+    }
+
+    const baseRows = virtualRows.map((item) => ({
+      index: item.index,
+      start: item.start,
+      end: item.end,
+    }));
+
+    const lastIndex = rowOrder.length - 1;
+    const includesLast = baseRows.some((item) => item.index === lastIndex);
+
+    if (isNearBottom && !includesLast) {
+      baseRows.push({
+        index: lastIndex,
+        start: Math.max(0, totalSize - estimateSize),
+        end: totalSize,
+      });
+    }
+
+    return baseRows;
+  }, [estimateSize, isNearBottom, rowOrder.length, totalSize, virtualRows]);
+
+  const handleContainerScroll = React.useCallback(() => {
+    const el = containerRef.current;
+    if (!el) {
+      return;
+    }
+
+    const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - estimateSize * 2;
+    setIsNearBottom((prev) => (prev === nearBottom ? prev : nearBottom));
+  }, [estimateSize]);
 
   const isCellSelected = React.useCallback(
     (rowId: string, colId: string) => store?.getState().isCellSelected(rowId, colId) ?? false,
@@ -399,6 +437,7 @@ export function GridVirtualized({
       onKeyDown={handleKeyDown}
       onCopy={handleCopy}
       onPaste={handlePaste}
+      onScroll={handleContainerScroll}
       className="outline-none relative"
       style={{ height, overflow: "auto" }}
       aria-label="Data grid clipboard region (virtualized)"
@@ -452,17 +491,23 @@ export function GridVirtualized({
         />
 
         <tbody>
-          {virtualRows.length > 0 ? (
+          {renderedVirtualRows.length > 0 ? (
             <>
-              {virtualRows[0] && (
-                <tr style={{ height: `${virtualRows[0].start}px` }} />
+              {renderedVirtualRows[0] && (
+                <tr aria-hidden="true">
+                  <td
+                    colSpan={columnSpan}
+                    style={{ height: `${renderedVirtualRows[0].start}px`, padding: 0, border: "none" }}
+                  />
+                </tr>
               )}
-              {virtualRows.map((virtualRow) => {
+              {renderedVirtualRows.map((virtualRow) => {
                 const rowId = rowOrder[virtualRow.index];
                 const rowIdx = virtualRow.index;
                 return (
                   <Row
                     key={rowId}
+                    rowRef={rowVirtualizer.measureElement}
                     rowId={rowId}
                     isLastRow={rowIdx === rowOrder.length - 1}
                     isSelected={selectedRowIds.has(rowId)}
@@ -481,12 +526,17 @@ export function GridVirtualized({
                   />
                 );
               })}
-              {virtualRows.length > 0 && (
-                <tr
-                  style={{
-                    height: `${Math.max(0, totalSize - (virtualRows[virtualRows.length - 1]?.end ?? 0))}px`,
-                  }}
-                />
+              {renderedVirtualRows.length > 0 && (
+                <tr aria-hidden="true">
+                  <td
+                    colSpan={columnSpan}
+                    style={{
+                      height: `${Math.max(0, totalSize - (renderedVirtualRows[renderedVirtualRows.length - 1]?.end ?? 0))}px`,
+                      padding: 0,
+                      border: "none",
+                    }}
+                  />
+                </tr>
               )}
             </>
           ) : null}

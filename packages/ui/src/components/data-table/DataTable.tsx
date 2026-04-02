@@ -15,14 +15,30 @@ import {
 import type { ViewStatePersistenceOptions } from "./viewStatePersistence";
 
 export interface DataTableProps extends GridProps {
+  /**
+   * Transport is treated as immutable after mount.
+   * To switch transport, remount DataTable (for example by changing key).
+   */
   transport: IOperationTransport;
+  /**
+   * Initial state is consumed only during bootstrap.
+   * Runtime updates should be dispatched through the store/manager APIs.
+   */
   initialState?: Partial<TableState>;
+  /**
+   * Persistence adapter is treated as immutable after mount.
+   * To switch persistence implementation, remount DataTable.
+   */
   persistence?: IOperationPersistence;
   connectivityMonitor?: IConnectivityMonitor;
   viewStatePersistence?: ViewStatePersistenceOptions;
   GridComponent?: React.ComponentType<GridProps>;
   onReady?: (api: DataTableApi) => void;
   children?: ReactNode;
+}
+
+function isDevelopmentEnvironment(): boolean {
+  return typeof process !== "undefined" && process.env.NODE_ENV !== "production";
 }
 
 export function DataTable({
@@ -40,6 +56,40 @@ export function DataTable({
     () => createDataTableApi({ transport, initialState, persistence }),
     [],
   ); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const initialImmutablePropsRef = React.useRef({
+    transport,
+    initialState,
+    persistence,
+  });
+  const warnedKeysRef = React.useRef(new Set<string>());
+
+  useEffect(() => {
+    if (!isDevelopmentEnvironment()) {
+      return;
+    }
+
+    const initialProps = initialImmutablePropsRef.current;
+    const warnOnce = (key: "transport" | "initialState" | "persistence") => {
+      if (warnedKeysRef.current.has(key)) {
+        return;
+      }
+      warnedKeysRef.current.add(key);
+      console.warn(
+        `[DataTable] Prop '${key}' changed after mount. This prop is treated as immutable and will not be reinitialized. Remount DataTable (for example with a different key) to apply the new value.`,
+      );
+    };
+
+    if (transport !== initialProps.transport) {
+      warnOnce("transport");
+    }
+    if (initialState !== initialProps.initialState) {
+      warnOnce("initialState");
+    }
+    if (persistence !== initialProps.persistence) {
+      warnOnce("persistence");
+    }
+  }, [transport, initialState, persistence]);
 
   useEffect(() => {
     void api.manager.loadPersistedOperations();

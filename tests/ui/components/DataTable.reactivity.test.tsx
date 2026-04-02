@@ -88,4 +88,50 @@ describe("DataTable schema reactivity", () => {
 
     expect(screen.queryByRole("columnheader", { name: "Label" })).not.toBeInTheDocument();
   });
+
+  it("warns in development when immutable DataTable props change after mount", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const anotherTransport: IOperationTransport = {
+      send: vi.fn().mockResolvedValue({ results: [] }),
+      loadTable: vi.fn(),
+    };
+
+    const { rerender } = render(
+      <DataTable
+        transport={transport}
+        initialState={{
+          schema: {
+            columns: {
+              label: { id: "label", type: "string", title: "Label" },
+            },
+            columnOrder: ["label"],
+            version: 1,
+          },
+          rows: new Map([["r1", { id: "r1", cells: { label: { value: "Row 1" } } }]]),
+          rowOrder: ["r1"],
+        }}
+      />,
+    );
+
+    rerender(
+      <DataTable
+        transport={anotherTransport}
+        initialState={{
+          schema: {
+            columns: {
+              label: { id: "label", type: "string", title: "Label" },
+            },
+            columnOrder: ["label"],
+            version: 1,
+          },
+          rows: new Map([["r1", { id: "r1", cells: { label: { value: "Row 1" } } }]]),
+          rowOrder: ["r1"],
+        }}
+      />,
+    );
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("[DataTable] Prop 'transport' changed after mount"));
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("[DataTable] Prop 'initialState' changed after mount"));
+    warnSpy.mockRestore();
+  });
 });
