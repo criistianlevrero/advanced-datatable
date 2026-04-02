@@ -4,8 +4,8 @@ import { DataTableContext } from "@advanced-datatable/react";
 import type { IConnectivityMonitor, IOperationPersistence } from "@advanced-datatable/operations";
 import type { IOperationTransport } from "@advanced-datatable/api-client";
 import type { TableState } from "@advanced-datatable/core";
-import { Grid } from "./Grid";
-import type { GridProps } from "./Grid";
+import { Grid } from "../grid";
+import type { GridProps } from "../grid";
 import { createDataTableApi } from "./createDataTableApi";
 import type { DataTableApi } from "./createDataTableApi";
 import {

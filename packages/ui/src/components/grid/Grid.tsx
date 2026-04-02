@@ -2,7 +2,7 @@ import React from "react";
 import type { TargetDescriptor } from "@advanced-datatable/core";
 import type { FilterValue } from "@advanced-datatable/store";
 import { DataTableContext, useDataTable } from "@advanced-datatable/react";
-import type { CellProps } from "./Cell";
+import type { CellProps } from "../cell";
 import { GridHeader } from "./GridHeader";
 import type { GridHeaderProps } from "./GridHeader";
 import type { GridFilterMenuProps } from "./GridFilterMenu";
@@ -215,7 +215,7 @@ export function Grid({
       cellSelection,
       rowOrder,
       schema.columnOrder,
-      (rowId, colId) => store?.getState().getCell(rowId, colId).value,
+      (rowId: string, colId: string) => store?.getState().getCell(rowId, colId).value,
     );
 
     if (!clipboardText) {
@@ -241,7 +241,7 @@ export function Grid({
       textToMatrix(text),
       rowOrder,
       schema,
-      (rowId, colId) => store?.getState().getCell(rowId, colId).meta?.readOnly === true,
+      (rowId: string, colId: string) => store?.getState().getCell(rowId, colId).meta?.readOnly === true,
     );
     if (!plan || plan.updates.length === 0) {
       return;

@@ -3,4 +3,4 @@ export {
   buildPastePlan,
   getSelectionAnchor,
   isEditableClipboardTarget,
-} from "../utils/clipboard";
+} from "../../utils/clipboard";

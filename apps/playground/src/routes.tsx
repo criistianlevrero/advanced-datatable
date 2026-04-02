@@ -10,6 +10,7 @@ import { ErrorRecoveryExample } from "./examples/error-recovery";
 import { PartialResponseExample } from "./examples/partial-response";
 import { EndToEndExample } from "./examples/end-to-end";
 import { SelectionLabExample } from "./examples/selection-lab";
+import { VirtualizationExample } from "./examples/virtualization";
 
 function OverviewPage(): React.ReactElement {
   return (
@@ -81,6 +82,21 @@ function OverviewPage(): React.ReactElement {
             Open selection lab
           </Button>
         </Card>
+
+        <Card withBorder radius="md" padding="lg">
+          <Group mb="sm">
+            <ThemeIcon size="lg" color="violet" variant="light">
+              <IconTable size={18} />
+            </ThemeIcon>
+            <Title order={3}>Virtualization</Title>
+          </Group>
+          <Text c="dimmed" mb="md">
+            10,000 filas virtualizadas con @tanstack/react-virtual para rendimiento óptimo.
+          </Text>
+          <Button component={Link} to="/virtualization" variant="light" color="violet">
+            Open virtualization demo
+          </Button>
+        </Card>
       </SimpleGrid>
     </Stack>
   );
@@ -142,6 +158,20 @@ function SelectionLabPage(): React.ReactElement {
   );
 }
 
+function VirtualizationPage(): React.ReactElement {
+  return (
+    <Stack gap="xl">
+      <div>
+        <Title order={2}>Virtualization</Title>
+        <Text c="dimmed">
+          Demo de 10,000 filas virtualizadas usando @tanstack/react-virtual. Todas las funcionalidades (sort, filter, select, edit) funcionan sin degradación de rendimiento.
+        </Text>
+      </div>
+      <VirtualizationExample />
+    </Stack>
+  );
+}
+
 export function AppRoutes(): React.ReactElement {
   return (
     <Routes>
@@ -150,6 +180,7 @@ export function AppRoutes(): React.ReactElement {
       <Route path="/resilience" element={<ResiliencePage />} />
       <Route path="/backend" element={<BackendPage />} />
       <Route path="/selection-lab" element={<SelectionLabPage />} />
+      <Route path="/virtualization" element={<VirtualizationPage />} />
     </Routes>
   );
 }

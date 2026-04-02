@@ -69,6 +69,14 @@ function Navigation(): React.ReactElement {
         leftSection={<IconKeyboard size={16} />}
         active={location.pathname === "/selection-lab"}
       />
+      <NavLink
+        component={Link}
+        to="/virtualization"
+        label="Virtualization"
+        description="10k rows with react-virtual"
+        leftSection={<IconTable size={16} />}
+        active={location.pathname === "/virtualization"}
+      />
     </Stack>
   );
 }

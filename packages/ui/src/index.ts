@@ -1,7 +1,7 @@
 import './index.css';
-export { Cell } from "./components/Cell";
-export type { CellProps } from "./components/Cell";
-export { Grid } from "./components/Grid";
-export type { GridProps } from "./components/Grid";
-export { DataTable } from "./components/DataTable";
-export type { DataTableProps } from "./components/DataTable";;
+export { Cell } from "./components/cell";
+export type { CellProps } from "./components/cell";
+export { Grid, GridVirtualized } from "./components/grid";
+export type { GridProps, GridHeaderProps, GridRowProps, GridFilterMenuProps, GridVirtualizedProps } from "./components/grid";
+export { DataTable } from "./components/data-table";
+export type { DataTableProps } from "./components/data-table";

@@ -1,8 +1,9 @@
 import React from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import type { TargetDescriptor } from "@advanced-datatable/core";
 import type { FilterValue } from "@advanced-datatable/store";
 import { DataTableContext, useDataTable } from "@advanced-datatable/react";
-import type { CellProps } from "./Cell";
+import type { CellProps } from "../cell";
 import { GridHeader } from "./GridHeader";
 import type { GridHeaderProps } from "./GridHeader";
 import type { GridFilterMenuProps } from "./GridFilterMenu";
@@ -23,12 +24,18 @@ import {
   textToMatrix,
 } from "./grid.helpers";
 
-export interface GridProps {
+export interface GridVirtualizedProps {
   renderCell?: (rowId: string, colId: string) => React.ReactNode;
   cellProps?: Partial<CellProps>;
   className?: string;
   headerClassName?: string;
   rowClassName?: string;
+  /** Height of the virtual scrolling container (e.g., "600px", "80vh") */
+  height: string;
+  /** Estimated height of each row in pixels (default: 40) */
+  estimateSize?: number;
+  /** Number of items to render outside of visible area (default: 10) */
+  overscan?: number;
   /** Enables header drag-resize for columns (default: false). */
   resizableColumns?: boolean;
   /** Show per-row selection checkboxes and a "select all" header checkbox. */
@@ -45,12 +52,15 @@ export interface GridProps {
   FilterMenuComponent?: React.ComponentType<GridFilterMenuProps>;
 }
 
-export function Grid({
+export function GridVirtualized({
   renderCell,
   cellProps,
   className,
   headerClassName,
   rowClassName,
+  height,
+  estimateSize = 40,
+  overscan = 10,
   resizableColumns = false,
   selectable = false,
   showFilters = false,
@@ -58,7 +68,7 @@ export function Grid({
   RowComponent,
   CellComponent,
   FilterMenuComponent,
-}: GridProps): React.ReactElement {
+}: GridVirtualizedProps): React.ReactElement {
   const Header = HeaderComponent ?? GridHeader;
   const Row = RowComponent ?? GridRow;
   const containerRef = React.useRef<HTMLDivElement | null>(null);
@@ -80,6 +90,17 @@ export function Grid({
   const allVisibleSelected =
     rowOrder.length > 0 && rowOrder.every((id) => selectedRowIds.has(id));
   const someSelected = rowOrder.some((id) => selectedRowIds.has(id));
+
+  // Setup virtualizer for rows
+  const rowVirtualizer = useVirtualizer({
+    count: rowOrder.length,
+    getScrollElement: () => containerRef.current,
+    estimateSize: () => estimateSize,
+    overscan,
+  });
+
+  const virtualRows = rowVirtualizer.getVirtualItems();
+  const totalSize = rowVirtualizer.getTotalSize();
 
   React.useEffect(() => {
     if (!isDraggingSelection) {
@@ -215,7 +236,7 @@ export function Grid({
       cellSelection,
       rowOrder,
       schema.columnOrder,
-      (rowId, colId) => store?.getState().getCell(rowId, colId).value,
+      (rowId: string, colId: string) => store?.getState().getCell(rowId, colId).value,
     );
 
     if (!clipboardText) {
@@ -241,7 +262,7 @@ export function Grid({
       textToMatrix(text),
       rowOrder,
       schema,
-      (rowId, colId) => store?.getState().getCell(rowId, colId).meta?.readOnly === true,
+      (rowId: string, colId: string) => store?.getState().getCell(rowId, colId).meta?.readOnly === true,
     );
     if (!plan || plan.updates.length === 0) {
       return;
@@ -354,7 +375,8 @@ export function Grid({
       onCopy={handleCopy}
       onPaste={handlePaste}
       className="outline-none relative"
-      aria-label="Data grid clipboard region"
+      style={{ height, overflow: "auto" }}
+      aria-label="Data grid clipboard region (virtualized)"
       aria-busy={isPastePending || undefined}
     >
       {isPastePending && (
@@ -371,61 +393,79 @@ export function Grid({
           'border-collapse border-none rounded-lg',
         ].filter(Boolean).join(' ')}
       >
-      <colgroup>
-        {selectable && <col style={{ width: 36 }} />}
-        {schema.columnOrder.map((colId) => {
-          const width = columnWidths[colId] ?? schema.columns[colId]?.width;
-          return <col key={colId} style={typeof width === "number" ? { width } : undefined} />;
-        })}
-      </colgroup>
-      <Header
-        schema={schema}
-        sortState={sortState}
-        filterState={filterState}
-        headerClassName={headerClassName}
-        selectable={selectable}
-        allVisibleSelected={allVisibleSelected}
-        someSelected={someSelected}
-        showFilters={showFilters}
-        resizableColumns={resizableColumns}
-        openFilterColId={openFilterColId}
-        hoveredResizableColId={hoveredResizableColId}
-        filterMenuRef={filterMenuRef}
-        onToggleAll={handleToggleAll}
-        onToggleSort={handleToggleSort}
-        onFilterChange={handleFilterChange}
-        onToggleFilterInvert={handleToggleFilterInvert}
-        onRemoveFilter={handleRemoveFilter}
-        onToggleFilterMenu={handleToggleFilterMenu}
-        onHoverColumn={handleHoverColumn}
-        onStartColumnResize={startColumnResize}
-        FilterMenuComponent={FilterMenuComponent}
-      />
+        <colgroup>
+          {selectable && <col style={{ width: 36 }} />}
+          {schema.columnOrder.map((colId) => {
+            const width = columnWidths[colId] ?? schema.columns[colId]?.width;
+            return <col key={colId} style={typeof width === "number" ? { width } : undefined} />;
+          })}
+        </colgroup>
 
-      <tbody>
-        {rowOrder.map((rowId, rowIdx) => (
-          <Row
-            key={rowId}
-            rowId={rowId}
-            isLastRow={rowIdx === rowOrder.length - 1}
-            isSelected={selectedRowIds.has(rowId)}
-            columnOrder={schema.columnOrder}
-            selectable={selectable}
-            rowClassName={rowClassName}
-            cellProps={cellProps}
-            cellSelection={cellSelection}
-            pendingPasteTarget={pendingPasteTarget}
-            isCellSelected={(r, c) => store?.getState().isCellSelected(r, c) ?? false}
-            onToggleRowSelection={() => store?.getState().toggleRowSelection(rowId)}
-            renderCell={renderCell}
-            CellComponent={CellComponent}
-            onCellMouseDown={(colId, event) => handleCellMouseDown(rowId, colId, event)}
-            onCellMouseEnter={(colId) => handleCellMouseEnter(rowId, colId)}
-          />
-        ))}
-      </tbody>
+        <Header
+          schema={schema}
+          sortState={sortState}
+          filterState={filterState}
+          headerClassName={headerClassName}
+          selectable={selectable}
+          allVisibleSelected={allVisibleSelected}
+          someSelected={someSelected}
+          showFilters={showFilters}
+          resizableColumns={resizableColumns}
+          openFilterColId={openFilterColId}
+          hoveredResizableColId={hoveredResizableColId}
+          filterMenuRef={filterMenuRef}
+          onToggleAll={handleToggleAll}
+          onToggleSort={handleToggleSort}
+          onFilterChange={handleFilterChange}
+          onToggleFilterInvert={handleToggleFilterInvert}
+          onRemoveFilter={handleRemoveFilter}
+          onToggleFilterMenu={handleToggleFilterMenu}
+          onHoverColumn={handleHoverColumn}
+          onStartColumnResize={startColumnResize}
+          FilterMenuComponent={FilterMenuComponent}
+        />
+
+        <tbody>
+          {virtualRows.length > 0 ? (
+            <>
+              {virtualRows[0] && (
+                <tr style={{ height: `${virtualRows[0].start}px` }} />
+              )}
+              {virtualRows.map((virtualRow) => {
+                const rowId = rowOrder[virtualRow.index];
+                const rowIdx = virtualRow.index;
+                return (
+                  <Row
+                    key={rowId}
+                    rowId={rowId}
+                    isLastRow={rowIdx === rowOrder.length - 1}
+                    isSelected={selectedRowIds.has(rowId)}
+                    columnOrder={schema.columnOrder}
+                    selectable={selectable}
+                    rowClassName={rowClassName}
+                    cellProps={cellProps}
+                    cellSelection={cellSelection}
+                    pendingPasteTarget={pendingPasteTarget}
+                    isCellSelected={(r, c) => store?.getState().isCellSelected(r, c) ?? false}
+                    onToggleRowSelection={() => store?.getState().toggleRowSelection(rowId)}
+                    renderCell={renderCell}
+                    CellComponent={CellComponent}
+                    onCellMouseDown={(colId, event) => handleCellMouseDown(rowId, colId, event)}
+                    onCellMouseEnter={(colId) => handleCellMouseEnter(rowId, colId)}
+                  />
+                );
+              })}
+              {virtualRows.length > 0 && (
+                <tr
+                  style={{
+                    height: `${Math.max(0, totalSize - (virtualRows[virtualRows.length - 1]?.end ?? 0))}px`,
+                  }}
+                />
+              )}
+            </>
+          ) : null}
+        </tbody>
       </table>
     </div>
   );
 }
-
