@@ -101,10 +101,16 @@ export function buildPastePlan(
       if (isCellReadOnly?.(rowId, colId) === true) {
         continue;
       }
+
+      const parsedValue = parseClipboardValue(rawValue, column.type);
+      if (parsedValue === INVALID_CLIPBOARD_VALUE) {
+        continue;
+      }
+
       updates.push({
         rowId,
         colId,
-        value: parseClipboardValue(rawValue, column.type),
+        value: parsedValue,
       });
     }
   }
@@ -166,7 +172,7 @@ function parseClipboardValue(
       return "";
     }
     const parsed = Number(normalized);
-    return Number.isFinite(parsed) ? parsed : rawValue;
+    return Number.isFinite(parsed) ? parsed : INVALID_CLIPBOARD_VALUE;
   }
 
   if (columnType === "boolean") {
@@ -177,10 +183,22 @@ function parseClipboardValue(
     if (["false", "0", "no", "n"].includes(normalized)) {
       return false;
     }
+    return INVALID_CLIPBOARD_VALUE;
+  }
+
+  if (columnType === "date") {
+    const normalized = rawValue.trim();
+    if (normalized === "") {
+      return "";
+    }
+    const parsed = Date.parse(normalized);
+    return Number.isNaN(parsed) ? INVALID_CLIPBOARD_VALUE : rawValue;
   }
 
   return rawValue;
 }
+
+const INVALID_CLIPBOARD_VALUE = Symbol("dt.invalidClipboardValue");
 
 export function isEditableClipboardTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) {

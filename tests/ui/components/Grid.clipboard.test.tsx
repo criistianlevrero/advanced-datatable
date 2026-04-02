@@ -301,6 +301,27 @@ describe("Grid clipboard", () => {
     expect(screen.getByText("Z")).toBeInTheDocument();
   });
 
+  it("skips only incompatible cells when pasting mixed values", () => {
+    renderTable();
+
+    fireEvent.mouseDown(screen.getByText("A1"));
+    fireEvent.mouseEnter(screen.getByText("2"));
+    fireEvent.mouseUp(screen.getByText("2"));
+
+    const clipboardData = {
+      getData: vi.fn().mockReturnValue("Z\tnot-a-number\nW\t20"),
+      setData: vi.fn(),
+    };
+
+    fireEvent.paste(screen.getByLabelText("Data grid clipboard region"), { clipboardData });
+
+    expect(screen.getByText("Z")).toBeInTheDocument();
+    expect(screen.getByText("W")).toBeInTheDocument();
+    expect(screen.getByText("1")).toBeInTheDocument();
+    expect(screen.getByText("20")).toBeInTheDocument();
+    expect(screen.queryByText("not-a-number")).not.toBeInTheDocument();
+  });
+
   it("shows pending visual feedback while paste is in flight", () => {
     renderTableWithPendingTransport();
 

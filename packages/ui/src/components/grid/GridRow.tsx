@@ -49,7 +49,7 @@ export function GridRow({
         rowClassName,
         "transition-colors",
         isSelected ? "bg-(--dt-row-hover)" : "bg-(--dt-bg)",
-        "hover:bg-(--dt-row-hover)",
+        "hover:bg-(--dt-row-hover-soft)",
       ].filter(Boolean).join(" ")}
       aria-selected={selectable ? isSelected : undefined}
     >
