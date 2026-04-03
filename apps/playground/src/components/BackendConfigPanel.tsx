@@ -3,9 +3,9 @@ import {
   Alert,
   Badge,
   Button,
+  Card,
   Code,
   Divider,
-  Drawer,
   Group,
   Slider,
   Stack,
@@ -14,12 +14,7 @@ import {
 } from "@mantine/core";
 import { CONFLICT_OP_ID, useBackendConfig } from "../backend/BackendConfigContext";
 
-interface BackendConfigDrawerProps {
-  opened: boolean;
-  onClose: () => void;
-}
-
-export function BackendConfigDrawer({ opened, onClose }: BackendConfigDrawerProps): React.ReactElement {
+export function BackendConfigPanel(): React.ReactElement {
   const {
     backendUrl,
     backendStatus,
@@ -32,19 +27,15 @@ export function BackendConfigDrawer({ opened, onClose }: BackendConfigDrawerProp
   } = useBackendConfig();
 
   return (
-    <Drawer
-      opened={opened}
-      onClose={onClose}
-      position="right"
-      title="Backend Configuration"
-      padding="lg"
-      size="md"
-    >
+    <Card withBorder radius="md" padding="lg">
       <Stack gap="lg">
-        <Group justify="space-between" align="center">
+        <Group justify="space-between" align="flex-start">
           <div>
-            <Text fw={600}>Mock backend</Text>
-            <Code>{backendUrl}</Code>
+            <Text fw={700}>Backend Configuration</Text>
+            <Text size="sm" c="dimmed" mt={4}>
+              Applies only to the Backend Integration demo on this page.
+            </Text>
+            <Code mt={8} style={{ display: "inline-block" }}>{backendUrl}</Code>
           </div>
           <Badge color={backendStatus === "online" ? "teal" : backendStatus === "offline" ? "red" : "gray"}>
             {backendStatus}
@@ -53,7 +44,7 @@ export function BackendConfigDrawer({ opened, onClose }: BackendConfigDrawerProp
 
         <Alert color={backendStatus === "online" ? "teal" : "yellow"}>
           {backendStatus === "online"
-            ? "Configuration from this panel is available on any playground route."
+            ? "These settings apply only to Backend Integration. Resilience scenarios use fully local mock transports and are not affected."
             : "The backend is not responding. Run npm run mock-backend to enable integrated routes."}
         </Alert>
 
@@ -129,6 +120,6 @@ export function BackendConfigDrawer({ opened, onClose }: BackendConfigDrawerProp
           </Button>
         </Group>
       </Stack>
-    </Drawer>
+    </Card>
   );
 }

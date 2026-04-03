@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import { DataTableContext } from "@advanced-datatable/react";
-import type { IConnectivityMonitor, IOperationPersistence } from "@advanced-datatable/operations";
+import type { IConnectivityMonitor, IOperationPersistence, OperationBatcherOptions } from "@advanced-datatable/operations";
 import type { IOperationTransport } from "@advanced-datatable/api-client";
 import type { TableState } from "@advanced-datatable/core";
 import { Grid } from "../grid";
@@ -30,6 +30,11 @@ export interface DataTableProps extends GridProps {
    * To switch persistence implementation, remount DataTable.
    */
   persistence?: IOperationPersistence;
+  /**
+   * Batcher/retry configuration is treated as immutable after mount.
+   * To switch it, remount DataTable.
+   */
+  batcherOptions?: number | OperationBatcherOptions;
   connectivityMonitor?: IConnectivityMonitor;
   viewStatePersistence?: ViewStatePersistenceOptions;
   GridComponent?: React.ComponentType<GridProps>;
@@ -45,6 +50,7 @@ export function DataTable({
   transport,
   initialState,
   persistence,
+  batcherOptions,
   connectivityMonitor,
   viewStatePersistence,
   GridComponent = Grid,
@@ -53,7 +59,7 @@ export function DataTable({
   ...gridProps
 }: DataTableProps): React.ReactElement {
   const api = useMemo(
-    () => createDataTableApi({ transport, initialState, persistence }),
+    () => createDataTableApi({ transport, initialState, persistence, batcherOptions }),
     [],
   ); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -61,6 +67,7 @@ export function DataTable({
     transport,
     initialState,
     persistence,
+    batcherOptions,
   });
   const warnedKeysRef = React.useRef(new Set<string>());
 
@@ -70,7 +77,7 @@ export function DataTable({
     }
 
     const initialProps = initialImmutablePropsRef.current;
-    const warnOnce = (key: "transport" | "initialState" | "persistence") => {
+    const warnOnce = (key: "transport" | "initialState" | "persistence" | "batcherOptions") => {
       if (warnedKeysRef.current.has(key)) {
         return;
       }
@@ -89,7 +96,10 @@ export function DataTable({
     if (persistence !== initialProps.persistence) {
       warnOnce("persistence");
     }
-  }, [transport, initialState, persistence]);
+    if (batcherOptions !== initialProps.batcherOptions) {
+      warnOnce("batcherOptions");
+    }
+  }, [transport, initialState, persistence, batcherOptions]);
 
   useEffect(() => {
     void api.manager.loadPersistedOperations();
