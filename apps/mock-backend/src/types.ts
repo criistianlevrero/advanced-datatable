@@ -1,14 +1,10 @@
-export interface MockOperation {
-  id: string;
-  type: string;
-  [key: string]: unknown;
-}
+import type { Operation, TableState } from "@advanced-datatable/core";
 
-export interface OperationBatchRequest {
-  operations: MockOperation[];
+export type OperationBatchRequest = {
+  operations: Operation[];
   clientId?: string;
   timestamp?: number;
-}
+};
 
 export interface OperationResult {
   opId: string;
@@ -18,6 +14,7 @@ export interface OperationResult {
 
 export interface OperationBatchResponse {
   results: OperationResult[];
+  state: TableState;
   timestamp?: number;
   conflictCount?: number;
 }
@@ -30,4 +27,9 @@ export interface MockTableResponse {
   };
   rows: Array<{ id: string; cells: Record<string, { value: unknown }> }>;
   rowOrder: string[];
+}
+
+export interface BackendIntegrationPullResponse {
+  cursor: number;
+  operations: Operation[];
 }

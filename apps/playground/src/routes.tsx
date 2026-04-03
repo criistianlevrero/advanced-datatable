@@ -10,7 +10,7 @@ import { SchemaDynamicExample } from "./examples/schema-dynamic";
 import { ReplayOnReconnectExample } from "./examples/replay-on-reconnect";
 import { ErrorRecoveryExample } from "./examples/error-recovery";
 import { PartialResponseExample } from "./examples/partial-response";
-import { EndToEndExample } from "./examples/end-to-end";
+import { BackendIntegrationExample } from "./examples/backend-integration";
 import { SelectionLabExample } from "./examples/selection-lab";
 import { VirtualizationExample } from "./examples/virtualization";
 import { mockTransport } from "./mocks/mockTransport";
@@ -109,10 +109,10 @@ function OverviewPage(): React.ReactElement {
             <Title order={3}>Backend Integration</Title>
           </Group>
           <Text c="dimmed" mb="md">
-            End-to-end demo with real HTTP and global backend configuration.
+            Partial operations + polling deltas for backend-computed values.
           </Text>
-          <Button component={Link} to="/backend" variant="light" color="teal">
-            Open backend tests
+          <Button component={Link} to="/backend-integration" variant="light" color="teal">
+            Open backend integration
           </Button>
         </Card>
 
@@ -196,16 +196,16 @@ function ResiliencePage(): React.ReactElement {
   );
 }
 
-function BackendPage(): React.ReactElement {
+function BackendIntegrationPage(): React.ReactElement {
   return (
     <Stack gap="xl">
       <div>
         <Title order={2}>Backend Integration</Title>
         <Text c="dimmed">
-          This route uses the real mock backend. The global drawer lets you change config without leaving the view.
+          Table data is loaded from backend. Edits send partial operations, and processed values are pulled as partial deltas.
         </Text>
       </div>
-      <EndToEndExample />
+      <BackendIntegrationExample />
     </Stack>
   );
 }
@@ -244,7 +244,7 @@ export function AppRoutes(): React.ReactElement {
       <Route path="/" element={<OverviewPage />} />
       <Route path="/core" element={<CorePage />} />
       <Route path="/resilience" element={<ResiliencePage />} />
-      <Route path="/backend" element={<BackendPage />} />
+      <Route path="/backend-integration" element={<BackendIntegrationPage />} />
       <Route path="/selection-lab" element={<SelectionLabPage />} />
       <Route path="/virtualization" element={<VirtualizationPage />} />
     </Routes>

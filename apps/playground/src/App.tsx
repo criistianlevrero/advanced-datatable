@@ -1,19 +1,14 @@
 import React from "react";
 import {
-  ActionIcon,
   AppShell,
-  Badge,
   Burger,
-  Button,
   Group,
   NavLink,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import {
-  IconAdjustmentsHorizontal,
   IconArrowsShuffle,
   IconHome2,
   IconKeyboard,
@@ -21,8 +16,7 @@ import {
   IconTable,
 } from "@tabler/icons-react";
 import { BrowserRouter, Link, useLocation } from "react-router-dom";
-import { BackendConfigProvider, useBackendConfig } from "./backend/BackendConfigContext";
-import { BackendConfigDrawer } from "./components/BackendConfigDrawer";
+import { BackendConfigProvider } from "./backend/BackendConfigContext";
 import { AppRoutes } from "./routes";
 
 function Navigation(): React.ReactElement {
@@ -55,11 +49,11 @@ function Navigation(): React.ReactElement {
       />
       <NavLink
         component={Link}
-        to="/backend"
+        to="/backend-integration"
         label="Backend Integration"
-        description="Real HTTP round-trip"
+        description="Partial ops + polling"
         leftSection={<IconPlugConnected size={16} />}
-        active={location.pathname === "/backend"}
+        active={location.pathname === "/backend-integration"}
       />
       <NavLink
         component={Link}
@@ -82,9 +76,7 @@ function Navigation(): React.ReactElement {
 }
 
 function PlaygroundShell(): React.ReactElement {
-  const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
-  const [navOpened, { toggle: toggleNav }] = useDisclosure(false);
-  const { backendStatus } = useBackendConfig();
+  const [navOpened, setNavOpened] = React.useState(false);
 
   return (
     <AppShell
@@ -95,23 +87,15 @@ function PlaygroundShell(): React.ReactElement {
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
           <Group>
-            <Burger opened={navOpened} onClick={toggleNav} hiddenFrom="sm" size="sm" />
+            <Burger opened={navOpened} onClick={() => setNavOpened((open) => !open)} hiddenFrom="sm" size="sm" />
             <div>
               <Title order={3}>Advanced DataTable Demo</Title>
-              <Text size="sm" c="dimmed">Test categories and shared backend</Text>
+              <Text size="sm" c="dimmed">Test categories and scenario-specific integrations</Text>
             </div>
           </Group>
 
           <Group>
-            <Badge color={backendStatus === "online" ? "teal" : backendStatus === "offline" ? "red" : "gray"}>
-              backend {backendStatus}
-            </Badge>
-            <Button leftSection={<IconAdjustmentsHorizontal size={16} />} onClick={openDrawer}>
-              Backend drawer
-            </Button>
-            <ActionIcon component={Link} to="/backend" variant="light" aria-label="Open backend route">
-              <IconPlugConnected size={18} />
-            </ActionIcon>
+            <Text size="sm" c="dimmed">Backend Integration is the main interactive backend demo.</Text>
           </Group>
         </Group>
       </AppShell.Header>
@@ -126,8 +110,6 @@ function PlaygroundShell(): React.ReactElement {
       <AppShell.Main>
         <AppRoutes />
       </AppShell.Main>
-
-      <BackendConfigDrawer opened={drawerOpened} onClose={closeDrawer} />
     </AppShell>
   );
 }
