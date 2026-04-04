@@ -462,7 +462,6 @@ const isDirectRun = process.argv[1]?.endsWith("server.ts") || process.argv[1]?.e
 
 if (isDirectRun) {
   void startMockBackend(createConfig({
-    port: 3001,
     latencyMs: 100,
     errorRate: 0,
     verbose: true,

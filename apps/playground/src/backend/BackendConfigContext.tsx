@@ -1,6 +1,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-export const BACKEND_URL = "http://localhost:3001";
+const configuredBackendUrl = import.meta.env.VITE_BACKEND_URL?.trim();
+
+export const BACKEND_URL = (
+  configuredBackendUrl && configuredBackendUrl.length > 0
+    ? configuredBackendUrl
+    : "http://localhost:3001"
+).replace(/\/$/, "");
+
 export const CONFLICT_OP_ID = "playground-conflict-op";
 
 export interface BackendConfig {
